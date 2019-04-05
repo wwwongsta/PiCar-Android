@@ -93,9 +93,8 @@ public class MainActivity extends AppCompatActivity
         boolean stayLoggedIn = sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false);
 
 
-
-
         extras = getIntent().getExtras();
+
         if(stayLoggedIn != true){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
