@@ -14,7 +14,7 @@ public class Transit {
     @ColumnInfo(name = "driver_id")
     private int driver_id;
 
-    @ColumnInfo(name = "pay_to")
+    @ColumnInfo(name = "path")
     private String path;
 
     public Transit() {

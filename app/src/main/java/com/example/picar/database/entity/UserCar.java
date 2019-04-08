@@ -18,7 +18,8 @@ public class UserCar {
     }
 
     @Ignore
-    public UserCar(int id, int user_id, String picture_car, String couleur, String brand, String registration, String categorie) {
+    public UserCar(int id, int user_id, String picture_car, String couleur,
+                   String brand, String registration, String categorie) {
         this.id = id;
         this.user_id = user_id;
         this.picture_car = picture_car;

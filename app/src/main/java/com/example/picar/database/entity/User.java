@@ -9,16 +9,16 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 
-
 @Entity(tableName = "users")
 public class User {
 
-    public User() {}
-
+    public User() {
+    }
 
 
     @Ignore
-    public User(int id, int payement_id, String name, String family_name, int cell, String email, String password, String user_photo) {
+    public User(int id, int payement_id, String name, String family_name,
+                String cell, String email, String password, String user_photo) {
         this.id = id;
         this.payement_id = payement_id;
         this.family_name = family_name;
@@ -32,7 +32,7 @@ public class User {
     @Override
     public String toString() {
         return
-                "id= " + id + " payement_id= " + payement_id + " name= " + name  + " family_name= " + family_name  + " cell= " + cell + " email= " + email + " password= " + password + " user_photo= " + user_photo ;
+                "id= " + id + " payement_id= " + payement_id + " name= " + name + " family_name= " + family_name + " cell= " + cell + " email= " + email + " password= " + password + " user_photo= " + user_photo;
     }
 
     @NonNull
@@ -50,7 +50,7 @@ public class User {
     private String family_name;
 
     @ColumnInfo(name = "cell")
-    private int cell;
+    private String cell;
 
     @ColumnInfo(name = "email")
     private String email;
@@ -94,11 +94,11 @@ public class User {
         this.name = name;
     }
 
-    public int getCell() {
+    public String getCell() {
         return cell;
     }
 
-    public void setCell(int cell) {
+    public void setCell(String cell) {
         this.cell = cell;
     }
 
