@@ -2,11 +2,16 @@ package com.example.picar.database.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-@Entity(tableName = "users_car")
+@Entity(tableName = "users_car",foreignKeys = @ForeignKey(entity = User.class,
+        parentColumns = "user_id",
+        childColumns = "user_id"),
+        indices = {@Index("user_id")})
 public class UserCar {
 
     public UserCar() {
@@ -29,7 +34,8 @@ public class UserCar {
     }
 
     @NonNull
-    @ColumnInfo(name = "user_car_id")
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     private int id;
 
     @ColumnInfo(name = "user_id")

@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 public class Transit {
 
     @NonNull
+    @PrimaryKey
     @ColumnInfo(name = "driver_id")
     private int driver_id;
 

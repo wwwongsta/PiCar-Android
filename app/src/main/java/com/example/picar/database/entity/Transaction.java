@@ -22,8 +22,11 @@ public class Transaction {
     }
 
     @NonNull
+    @PrimaryKey
     @ColumnInfo(name = "transaction_id")
     private int id;
+
+
 
     @ColumnInfo(name = "pay_to")
     private String pay_to;
@@ -69,4 +72,8 @@ public class Transaction {
     public void setDate(String date) {
         this.date = date;
     }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 }
