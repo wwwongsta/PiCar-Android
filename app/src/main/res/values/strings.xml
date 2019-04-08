@@ -29,4 +29,10 @@
 
     <string name="google_maps_key">AIzaSyCuVRI7DHeHx5k9bnF32q1IOz35hNpZ2dQ</string>
     <string name="title_activity_settings">SettingsActivity</string>
+
+    <string name="Name">Nom:    </string>
+    <string name="Phone">Phone: </string>
+    <string name="Email">Email: </string>
+    <string name="Password">Password:   </string>
+    <string name="SignIn">Sign In</string>
 </resources>

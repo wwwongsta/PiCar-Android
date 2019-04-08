@@ -96,6 +96,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+
         mLoggedInCheckbox = (CheckBox) findViewById(R.id.checkBox_stay_logged_in);
         mLoggedInCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
