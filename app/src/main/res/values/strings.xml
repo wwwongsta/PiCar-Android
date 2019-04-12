@@ -20,6 +20,7 @@
         completions."
     </string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_card_view">Rides</string>
 
 
     <string name="default_info_title">Default Location</string>

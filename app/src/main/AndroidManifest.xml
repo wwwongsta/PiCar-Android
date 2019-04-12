@@ -44,6 +44,9 @@
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
+            android:name=".activities.CardViewActivity"
+            android:label="@string/title_activity_card_view" />
+        <activity
             android:name=".activities.SettingsActivity"
             android:label="Settings"
             android:parentActivityName=".activities.MainActivity">
