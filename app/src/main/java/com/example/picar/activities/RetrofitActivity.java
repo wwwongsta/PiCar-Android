@@ -30,8 +30,32 @@ public class RetrofitActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         api = retrofit.create(PiCarApi.class);
-//        getusers();
-        getAllPosition();
+        getusers();
+      //  getAllPosition();
+    }
+    private void getUser(){
+        Call<User> call = api.getUser("secondTest@mail.com");
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if(!response.isSuccessful()){
+                    tx.setText("code : "+ response.code());
+                    return;
+                }
+                User user = response.body();
+
+                    tx.append(user.getPassword());
+
+
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                tx.setText(t.getMessage());
+            }
+        });
+
+
     }
     private void getAllPosition(){
         Call<List<Position>> call = api.getAllPosition();
