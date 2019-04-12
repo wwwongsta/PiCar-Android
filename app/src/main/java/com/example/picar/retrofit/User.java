@@ -1,8 +1,7 @@
 package com.example.picar.retrofit;
 
-import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
 public class User {
     /**

@@ -9,4 +9,7 @@ public interface PiCarApi {
 
     @GET("user/all")
     Call<List<User>> getAllUser();
+
+    @GET("position/")
+    Call<List<Position>> getAllPosition();
 }
