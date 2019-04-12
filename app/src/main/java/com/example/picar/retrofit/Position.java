@@ -1,6 +1,7 @@
 package com.example.picar.retrofit;
 
 public class Position {
+
     /**
      * {
      *   "_id": "5cb0bbc3dfd8360017f28389",
@@ -29,5 +30,13 @@ public class Position {
 
     public String getUserId() {
         return userId;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
     }
 }

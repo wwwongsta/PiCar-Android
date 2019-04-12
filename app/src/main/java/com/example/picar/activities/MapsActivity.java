@@ -25,7 +25,6 @@ import android.widget.Toast;
 
 
 import com.example.picar.R;
-import com.example.picar.database.AppDatabase;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -146,7 +145,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
                     mMap.animateCamera(cu);
-
                 }
             }
         });
