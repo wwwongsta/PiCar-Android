@@ -19,7 +19,7 @@ public class Position {
 
     public Position() {
     }
-
+@Ignore
     public Position(int id, int latitude, int longitude, int userId) {
         this.id = id;
         this.latitude = latitude;

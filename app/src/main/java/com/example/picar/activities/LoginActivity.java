@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,9 +34,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.picar.R;
+import com.example.picar.retrofit.PiCarApi;
+import com.example.picar.retrofit.User;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -72,10 +81,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private String userPassWord;
 
 
+    private TextView afficheApi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        afficheApi = findViewById(R.id.content);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -217,6 +228,40 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
+         PiCarApi api;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://cryptic-stream-69346.herokuapp.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        api = retrofit.create(PiCarApi.class);
+        Call<List<User>> call = api.getAllUser();
+        call.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                if(!response.isSuccessful()){
+                    afficheApi.setText("code : "+ response.code());
+                    Log.i("RETROFIT","code : "+ response.code());
+                    return;
+                }
+                List<User> users = response.body();
+                for (User user:users){
+                    String content = "";
+                    content += "Email :" + user.getEmail() + "\n";
+                    content += "Password :"+ user.getPassword()+"\n";
+                    afficheApi.append(content);
+                    Log.i("RETROFIT",content);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                afficheApi.setText(t.getMessage());
+                Log.i("RETROFIT",t.getMessage());
+            }
+        });
+
+        Log.i("RETROFIT","Message Test");
+
 
 
         return email.contains("@");
