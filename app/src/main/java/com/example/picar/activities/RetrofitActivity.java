@@ -57,31 +57,31 @@ public class RetrofitActivity extends AppCompatActivity {
 
 
     }
-    private void getAllPosition(){
-        Call<List<Position>> call = api.getAllPosition();
-        call.enqueue(new Callback<List<Position>>() {
-            @Override
-            public void onResponse(Call<List<Position>> call, Response<List<Position>> response) {
-                if(!response.isSuccessful()){
-                    tx.setText("code : "+ response.code());
-                    return;
-                }
-                List<Position> positions = response.body();
-                for (Position position:positions){
-                    String content = "";
-                    content += "Lat :" + position.getLat() + "\n";
-                    content += "Lng :"+ position.getLng()+"\n";
-                    tx.append(content);
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<List<Position>> call, Throwable t) {
-                tx.setText(t.getMessage());
-            }
-        });
-    }
+//    private void getAllPosition(){
+//        Call<List<Position>> call = api.getAllPosition();
+//        call.enqueue(new Callback<List<Position>>() {
+//            @Override
+//            public void onResponse(Call<List<Position>> call, Response<List<Position>> response) {
+//                if(!response.isSuccessful()){
+//                    tx.setText("code : "+ response.code());
+//                    return;
+//                }
+//                List<Position> positions = response.body();
+//                for (Position position:positions){
+//                    String content = "";
+//                    content += "Lat :" + position.getLat() + "\n";
+//                    content += "Lng :"+ position.getLng()+"\n";
+//                    tx.append(content);
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Position>> call, Throwable t) {
+//                tx.setText(t.getMessage());
+//            }
+//        });
+//    }
     private void getusers(){
         Call<List<User>> call = api.getAllUser();
         call.enqueue(new Callback<List<User>>() {

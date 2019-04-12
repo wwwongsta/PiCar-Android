@@ -11,13 +11,13 @@ public class Position {
      *   "__v": 0
      * }
      */
-    private String _id;
+    private String id;
     private double lat;
     private double lng;
     private String userId;
 
-    public String get_id() {
-        return _id;
+    public String getId() {
+        return id;
     }
 
     public double getLat() {
@@ -38,5 +38,12 @@ public class Position {
 
     public void setLng(double lng) {
         this.lng = lng;
+    }
+
+    public Position(String id, double lat, double lng, String userId) {
+        this.id = id;
+        this.lat = lat;
+        this.lng = lng;
+        this.userId = userId;
     }
 }

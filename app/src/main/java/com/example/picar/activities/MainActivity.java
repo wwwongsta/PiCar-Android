@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
 
         Address address;
         try {
-            address = getCoordinatesOfAddress(this,"Montreal,Cananda");
+            address = getCoordinatesOfAddress(this,"Montreal");
             setTitle(address.getLatitude() + ", " + address.getLongitude());
         } catch (IOException e) {
             e.printStackTrace();

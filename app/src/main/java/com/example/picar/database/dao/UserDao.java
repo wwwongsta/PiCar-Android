@@ -27,5 +27,9 @@ public interface UserDao {
     List<User> getListUser();
     @Query("SELECT * FROM users WHERE name LIKE :email LIMIT 1")
     User get_User_ByEmail(String email);
+    @Query("SELECT current_position_id FROM users")
+    String getUserCurrentPositionId();
+    @Query("SELECT destination_id FROM users")
+    String getDestinationId();
 
 }

@@ -25,8 +25,11 @@ import android.widget.Toast;
 
 
 import com.example.picar.R;
+import com.example.picar.database.AppDatabase;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
+import com.example.picar.retrofit.PiCarApi;
+import com.example.picar.retrofit.Position;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -54,6 +57,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback {
     private static final String TAG = MapsActivity.class.getSimpleName();
@@ -92,6 +101,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     EditText locationSearch;
 
+    private PiCarApi api;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +112,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://cryptic-stream-69346.herokuapp.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        api = retrofit.create(PiCarApi.class);
+
 
         setContentView(R.layout.activity_maps);
 
@@ -145,6 +163,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
                     mMap.animateCamera(cu);
+
+//                    String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
+//                    String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
+
+                    //pour test car on a pas de user encore
+                    String currentLocationId = "5cb0f5ac5781820017b60bab";
+                    String destinationId = "5cb0f5ac5781820017b60baa";
+
+                    updatePosition(currentLocationId, mCurrentMarkerOptions);
+                    updatePosition(destinationId, mDestinationMarkerOptions);
+
                 }
             }
         });
@@ -157,6 +186,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 setCurrentLocation(ed_location);
             }
         });
+    }
+
+    private void updatePosition(String id, MarkerOptions marker) {
+        Position position = new Position(id, marker.getPosition().latitude, marker.getPosition().longitude,id);
+
+        Call<Position> call = api.putPosition(id, position);
+
+        call.enqueue(new Callback<Position>() {
+            @Override
+            public void onResponse(Call<Position> call, Response<Position> response) {            }
+
+            @Override
+            public void onFailure(Call<Position> call, Throwable t) {            }
+        });
+
     }
 
     @Override
@@ -180,7 +224,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
-        updateLocationUI();
+
     }
 
 
