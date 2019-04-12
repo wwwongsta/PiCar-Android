@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.example.picar.R;
+import com.example.picar.retrofit.Message;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.Position;
 import com.example.picar.retrofit.User;
+import com.example.picar.retrofit.UserInfo;
+import com.example.picar.retrofit.UserLogin;
 
 import java.util.List;
 
@@ -30,8 +33,56 @@ public class RetrofitActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         api = retrofit.create(PiCarApi.class);
-//        getusers();
-        getAllPosition();
+        getuser();
+//       getusers();
+       // getAllPosition();
+//       createUser();
+    }
+    private void getuser(){
+        UserLogin user = new UserLogin("test@gmail.com",true);
+        Call<UserInfo> call = api.getUserInfo(user);
+        call.enqueue(new Callback<UserInfo>() {
+            @Override
+            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+                if(!response.isSuccessful()){
+                    tx.setText("code : "+ response.code());
+                    return;
+                }
+                UserInfo userInfo = response.body();
+                String content = "";
+                content += "Email : "+ userInfo.getUser_info().getEmail() + "\n";
+                content += "Name : "+ userInfo.getUser_info().getName();
+                tx.append(content);
+            }
+
+            @Override
+            public void onFailure(Call<UserInfo> call, Throwable t) {
+                tx.setText(t.getMessage());
+            }
+        });
+    }
+    private void createUser(){
+        User user = new User("test@gmail.com","aPassword","FamilyName","Name",562398741);
+        Call<Message> call = api.createUser(user);
+        call.enqueue(new Callback<Message>() {
+
+            @Override
+            public void onResponse(Call<Message> call, Response<Message> response) {
+                if(!response.isSuccessful()){
+                    tx.setText("code : "+ response.code());
+                    return;
+                }
+                Message mes = response.body();
+                String content = "";
+                content += "Message : "+ mes.getMessage();
+                tx.append(content);
+            }
+
+            @Override
+            public void onFailure(Call<Message> call, Throwable t) {
+                tx.setText(t.getMessage());
+            }
+        });
     }
     private void getAllPosition(){
         Call<List<Position>> call = api.getAllPosition();

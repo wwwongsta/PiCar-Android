@@ -17,6 +17,14 @@ public class User {
     private String current_position_id;
     private String destination_id;
     private String _id;
+    private String token;
+    public User(String email, String password, String family_name, String name, Number phone) {
+        this.email = email;
+        this.password = password;
+        this.family_name = family_name;
+        this.name = name;
+        this.phone = phone;
+    }
 
     public String getCurrent_position_id() {
         return current_position_id;
