@@ -147,7 +147,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     mMap.animateCamera(cu);
 
-                    AppDatabase.getInstance().
                 }
             }
         });
