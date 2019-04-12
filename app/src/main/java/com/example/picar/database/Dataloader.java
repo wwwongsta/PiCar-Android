@@ -65,12 +65,12 @@ public class Dataloader {
     private static List<User> getUserForTest() {
 
         List<User> users = new ArrayList<User>();
-        users.add(new User(1, 123, "Ben10", "Tennyson", "514-0343-3432", "ben@10.com", "mamasita10", "Path/Photo/User/Here"));
-        users.add(new User(2, 423, "Peter", "Packer", "450-958-9898", "Peter@Packer.com", "papasito12", "Path/Photo/User/Here"));
-        users.add(new User(3, 567, "Ness", "Smash","438-302-1201", "Naruto@Uzumaki.com", "CelinDion", "Path/Photo/User/Here"));
-        users.add(new User(4, 876,"Olimar", "Bros", "956-320-1201", "Sasuke@Uchiha.com", "Uselase", "Path/Photo/User/Here"));
-        users.add(new User(5, 678, "Naruto", "Uzumaki",  "845-320-3020", "Ness@Smash.com", "Smashqw", "Path/Photo/User/Here"));
-        users.add(new User(6, 889, "Sasuke", "Uchiha",  "620-987-2121", "Olimar@Smash.com", "Poloer", "Path/Photo/User/Here"));
+        users.add(new User(1, 123, "Ben10", "Tennyson", "514-0343-3432", "ben@10.com", "mamasita10", "Path/Photo/User/Here",1));
+        users.add(new User(2, 423, "Peter", "Packer", "450-958-9898", "Peter@Packer.com", "papasito12", "Path/Photo/User/Here",2));
+        users.add(new User(3, 567, "Ness", "Smash","438-302-1201", "Naruto@Uzumaki.com", "CelinDion", "Path/Photo/User/Here",2));
+        users.add(new User(4, 876,"Olimar", "Bros", "956-320-1201", "Sasuke@Uchiha.com", "Uselase", "Path/Photo/User/Here",2));
+        users.add(new User(5, 678, "Naruto", "Uzumaki",  "845-320-3020", "Ness@Smash.com", "Smashqw", "Path/Photo/User/Here",2));
+        users.add(new User(6, 889, "Sasuke", "Uchiha",  "620-987-2121", "Olimar@Smash.com", "Poloer", "Path/Photo/User/Here",2));
 
         return users;
 
