@@ -12,6 +12,11 @@ public interface PiCarApi {
     @GET("user/all")
     Call<List<User>> getAllUser();
 
+
     @GET("user")
     Call<User> getUser(@Header("email") String email);
+
+    @GET("position/")
+    Call<List<Position>> getAllPosition();
+
 }

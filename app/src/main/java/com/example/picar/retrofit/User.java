@@ -16,9 +16,6 @@ public class User {
     private String position;
     private String _id;
 
-    @SerializedName("body")
-    private String text;
-
     public String getFamily_name() {
         return family_name;
     }
@@ -47,7 +44,4 @@ public class User {
         return password;
     }
 
-    public String getText() {
-        return text;
-    }
 }
