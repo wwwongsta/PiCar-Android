@@ -14,8 +14,17 @@ public class User {
     private String family_name;
     private String name;
     private Number phone;
-    private String position;
+    private String current_position_id;
+    private String destination_id;
     private String _id;
+
+    public String getCurrent_position_id() {
+        return current_position_id;
+    }
+
+    public String getDestination_id() {
+        return destination_id;
+    }
 
     public String getFamily_name() {
         return family_name;
@@ -27,10 +36,6 @@ public class User {
 
     public Number getPhone() {
         return phone;
-    }
-
-    public String getPosition() {
-        return position;
     }
 
     public String get_id() {
