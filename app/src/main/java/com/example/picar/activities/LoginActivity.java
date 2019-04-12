@@ -20,7 +20,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,18 +33,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.picar.R;
-import com.example.picar.database.AppDatabase;
-import com.example.picar.database.entity.User;
 
-import org.json.JSONObject;
-
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -66,6 +56,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
     };
+    private static final String TAG = "JSON";
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -116,9 +107,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 SharedPreferences prefs = getSharedPreferences(getApplicationContext().getPackageName(), Context.MODE_PRIVATE);
 
-                if(mLoggedInCheckbox.isChecked()) {
+                if (mLoggedInCheckbox.isChecked()) {
                     prefs.edit().putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, true).commit();
-                }else{
+                } else {
                     prefs.edit().putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false).commit();
                 }
             }
@@ -225,51 +216,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-
-        sendPost();
-        return email.contains("@") ;
+        //TODO: Replace this with your own logic
+        return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 4;
-    }
-    public void sendPost() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL("https://cryptic-stream-69346.herokuapp.com/user/login");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-                    conn.setRequestProperty("Accept","application/json");
-                    conn.setDoOutput(true);
-                    conn.setDoInput(true);
-
-                    JSONObject jsonParam = new JSONObject();
-
-                    jsonParam.put("email", "secondTest@mail.com");
-                    jsonParam.put("password","unaTest");
-
-
-                    Log.i("JSON", jsonParam.toString());
-                    DataOutputStream os = new DataOutputStream(conn.getOutputStream());
-                    os.writeBytes(jsonParam.toString());
-
-                    os.flush();
-                    os.close();
-
-                    Log.i("STATUS", String.valueOf(conn.getResponseCode()));
-                    Log.i("MSG" , conn.getResponseMessage());
-                    conn.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        thread.start();
     }
 
     /**
@@ -417,5 +370,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
         }
     }
+
+
 }
 
