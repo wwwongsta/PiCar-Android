@@ -1,8 +1,7 @@
 package com.example.picar.retrofit;
 
-import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
 public class User {
     /**
@@ -34,6 +33,9 @@ public class User {
         return destination_id;
     }
 
+    @SerializedName("body")
+    private String text;
+
     public String getFamily_name() {
         return family_name;
     }
@@ -58,4 +60,7 @@ public class User {
         return password;
     }
 
+    public String getText() {
+        return text;
+    }
 }

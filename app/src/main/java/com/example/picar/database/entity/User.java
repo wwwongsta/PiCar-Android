@@ -18,8 +18,10 @@ public class User {
 
     @Ignore
     public User(int id, int payement_id, String name, String family_name,
-                String cell, String email, String password, String user_photo) {
+                String cell, String email, String password, String user_photo, String current_position_id, String destination_id) {
         this.id = id;
+        this.current_position_id=current_position_id;
+        this.destination_id=destination_id;
         this.payement_id = payement_id;
         this.family_name = family_name;
         this.name = name;
@@ -28,17 +30,23 @@ public class User {
         this.password = password;
         this.user_photo = user_photo;
     }
+//
+//    @Override
+//    public String toString() {
+//        return
+//                "id= " + id + " position = " + position + " payement_id= " + payement_id + " name= " + name + " family_name= " + family_name + " cell= " + cell + " email= " + email + " password= " + password + " user_photo= " + user_photo;
+//    }
 
-    @Override
-    public String toString() {
-        return
-                "id= " + id + " payement_id= " + payement_id + " name= " + name + " family_name= " + family_name + " cell= " + cell + " email= " + email + " password= " + password + " user_photo= " + user_photo;
-    }
 
-    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "user_id")
     private int id;
+
+    @ColumnInfo(name = "current_position_id")
+    private String current_position_id;
+
+    @ColumnInfo(name = "destination_id")
+    private String destination_id;
 
     @ColumnInfo(name = "payement_id")
     private int payement_id;
@@ -60,6 +68,7 @@ public class User {
 
     @ColumnInfo(name = "user_photo")
     private String user_photo;
+
 
 
     public int getId() {
@@ -126,5 +135,19 @@ public class User {
         this.user_photo = user_photo;
     }
 
+    public String getCurrent_position_id() {
+        return current_position_id;
+    }
 
+    public void setCurrent_position_id(String current_position_id) {
+        this.current_position_id = current_position_id;
+    }
+
+    public String getDestination_id() {
+        return destination_id;
+    }
+
+    public void setDestination_id(String destination_id) {
+        this.destination_id = destination_id;
+    }
 }

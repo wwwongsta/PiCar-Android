@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //checkLogIn();
+        checkLogIn();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity
         /**
          * Start activity retrofit for test
          */
-        Intent i = new Intent(this,RetrofitActivity.class);
-        startActivity(i);
+//        Intent i = new Intent(this,RetrofitActivity.class);
+//        startActivity(i);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
 
         Address address;
         try {
-            address = getCoordinatesOfAddress(this,"Montreal,Cananda");
+            address = getCoordinatesOfAddress(this,"Montreal");
             setTitle(address.getLatitude() + ", " + address.getLongitude());
         } catch (IOException e) {
             e.printStackTrace();
