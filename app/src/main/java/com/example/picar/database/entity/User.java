@@ -3,44 +3,29 @@ package com.example.picar.database.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-import com.google.gson.annotations.SerializedName;
 @Entity(tableName = "users")
 public class User {
 
     public User() {
     }
-
     @Ignore
-    public User(int id, int payement_id, String name, String family_name,
-                String cell, String email, String password, String user_photo, String current_position_id, String destination_id) {
-        this.id = id;
-        this.current_position_id=current_position_id;
-        this.destination_id=destination_id;
-        this.payement_id = payement_id;
-        this.family_name = family_name;
-        this.name = name;
-        this.cell = cell;
+    public User(String email, String password, String family_name, String name, String phone) {
         this.email = email;
         this.password = password;
-        this.user_photo = user_photo;
+        this.family_name = family_name;
+        this.name = name;
+        this.phone = phone;
     }
-//
-//    @Override
-//    public String toString() {
-//        return
-//                "id= " + id + " position = " + position + " payement_id= " + payement_id + " name= " + name + " family_name= " + family_name + " cell= " + cell + " email= " + email + " password= " + password + " user_photo= " + user_photo;
-//    }
-
-
+    
     @PrimaryKey
-    @SerializedName("_id")
-    @ColumnInfo(name = "user_id")
-    private int id;
+    @NonNull
+    @ColumnInfo(name = "_id")
+    private String _id;
+
 
     @ColumnInfo(name = "current_position_id")
     private String current_position_id;
@@ -57,8 +42,8 @@ public class User {
     @ColumnInfo(name = "family_name")
     private String family_name;
 
-    @ColumnInfo(name = "cell")
-    private String cell;
+    @ColumnInfo(name = "phone")
+    private String phone;
 
     @ColumnInfo(name = "email")
     private String email;
@@ -69,14 +54,12 @@ public class User {
     @ColumnInfo(name = "user_photo")
     private String user_photo;
 
-
-
-    public int getId() {
-        return id;
+    public String get_id() {
+        return _id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
     public int getPayement_id() {
@@ -103,12 +86,12 @@ public class User {
         this.name = name;
     }
 
-    public String getCell() {
-        return cell;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setCell(String cell) {
-        this.cell = cell;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getEmail() {
@@ -149,5 +132,21 @@ public class User {
 
     public void setDestination_id(String destination_id) {
         this.destination_id = destination_id;
+    }
+
+    @Override
+    public String toString() {
+        return "User{\\n" +
+                "_id='" + _id + '\'' +
+                ",\n current_position_id='" + current_position_id + '\'' +
+                ",\n destination_id='" + destination_id + '\'' +
+                ",\n payement_id=" + payement_id +
+                ",\n name='" + name + '\'' +
+                ",\n family_name='" + family_name + '\'' +
+                ",\n phone='" + phone + '\'' +
+                ",\n email='" + email + '\'' +
+                ",\n password='" + password + '\'' +
+                ",\n user_photo='" + user_photo + '\'' +
+                "\n}";
     }
 }

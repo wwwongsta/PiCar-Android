@@ -1,0 +1,74 @@
+Index: app/src/main/java/com/example/picar/retrofit/User.java
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/User.java	(date 1555106373000)
++++ app/src/main/java/com/example/picar/retrofit/UserDataFormat/User.java	(date 1555121222000)
+@@ -1,4 +1,4 @@
+-package com.example.picar.retrofit;
++package com.example.picar.retrofit.UserDataFormat;
+ 
+ import com.google.gson.annotations.SerializedName;
+ 
+Index: app/src/main/java/com/example/picar/activities/RetrofitActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.picar.activities;\n\nimport android.support.v7.app.AppCompatActivity;\nimport android.os.Bundle;\nimport android.widget.TextView;\n\nimport com.example.picar.R;\nimport com.example.picar.retrofit.Message;\nimport com.example.picar.retrofit.PiCarApi;\nimport com.example.picar.retrofit.Position;\nimport com.example.picar.retrofit.User;\nimport com.example.picar.retrofit.UserInfo;\nimport com.example.picar.retrofit.UserLogin;\n\nimport java.util.List;\n\nimport retrofit2.Call;\nimport retrofit2.Callback;\nimport retrofit2.Response;\nimport retrofit2.Retrofit;\nimport retrofit2.converter.gson.GsonConverterFactory;\n\npublic class RetrofitActivity extends AppCompatActivity {\n    TextView tx;\n    private PiCarApi api;\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_retrofit);\n        tx = (TextView) findViewById(R.id.retrofitTest);\n        Retrofit retrofit = new Retrofit.Builder()\n                .baseUrl(\"https://cryptic-stream-69346.herokuapp.com/\")\n                .addConverterFactory(GsonConverterFactory.create())\n                .build();\n        api = retrofit.create(PiCarApi.class);\n        getuser();\n//       getusers();\n       // getAllPosition();\n//       createUser();\n    }\n    private void getuser(){\n        UserLogin user = new UserLogin(\"test@gmail.com\",true);\n        Call<UserInfo> call = api.getUserInfo(user);\n        call.enqueue(new Callback<UserInfo>() {\n            @Override\n            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {\n                if(!response.isSuccessful()){\n                    tx.setText(\"code : \"+ response.code());\n                    return;\n                }\n                UserInfo userInfo = response.body();\n                String content = \"\";\n                content += \"Email : \"+ userInfo.getUser_info().getEmail() + \"\\n\";\n                content += \"Name : \"+ userInfo.getUser_info().getName();\n                tx.append(content);\n            }\n\n            @Override\n            public void onFailure(Call<UserInfo> call, Throwable t) {\n                tx.setText(t.getMessage());\n            }\n        });\n    }\n    private void createUser(){\n        User user = new User(\"test@gmail.com\",\"aPassword\",\"FamilyName\",\"Name\",562398741);\n        Call<Message> call = api.createUser(user);\n        call.enqueue(new Callback<Message>() {\n\n            @Override\n            public void onResponse(Call<Message> call, Response<Message> response) {\n                if(!response.isSuccessful()){\n                    tx.setText(\"code : \"+ response.code());\n                    return;\n                }\n                Message mes = response.body();\n                String content = \"\";\n                content += \"Message : \"+ mes.getMessage();\n                tx.append(content);\n            }\n\n            @Override\n            public void onFailure(Call<Message> call, Throwable t) {\n                tx.setText(t.getMessage());\n            }\n        });\n    }\n    private void getAllPosition(){\n        Call<List<Position>> call = api.getAllPosition();\n        call.enqueue(new Callback<List<Position>>() {\n            @Override\n            public void onResponse(Call<List<Position>> call, Response<List<Position>> response) {\n                if(!response.isSuccessful()){\n                    tx.setText(\"code : \"+ response.code());\n                    return;\n                }\n                List<Position> positions = response.body();\n                for (Position position:positions){\n                    String content = \"\";\n                    content += \"Lat :\" + position.getLat() + \"\\n\";\n                    content += \"Lng :\"+ position.getLng()+\"\\n\";\n                    tx.append(content);\n                }\n\n            }\n\n            @Override\n            public void onFailure(Call<List<Position>> call, Throwable t) {\n                tx.setText(t.getMessage());\n            }\n        });\n    }\n    private void getusers(){\n        Call<List<User>> call = api.getAllUser();\n        call.enqueue(new Callback<List<User>>() {\n            @Override\n            public void onResponse(Call<List<User>> call, Response<List<User>> response) {\n                if(!response.isSuccessful()){\n                    tx.setText(\"code : \"+ response.code());\n                    return;\n                }\n                List<User> users = response.body();\n                for (User user:users){\n                    String content = \"\";\n                    content += \"Email :\" + user.getEmail() + \"\\n\";\n                    content += \"Password :\"+ user.getPassword()+\"\\n\";\n                    tx.append(content);\n                }\n            }\n\n            @Override\n            public void onFailure(Call<List<User>> call, Throwable t) {\n                tx.setText(t.getMessage());\n            }\n        });\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/picar/activities/RetrofitActivity.java	(date 1555106373000)
++++ app/src/main/java/com/example/picar/activities/RetrofitActivity.java	(date 1555121222000)
+@@ -8,9 +8,9 @@
+ import com.example.picar.retrofit.Message;
+ import com.example.picar.retrofit.PiCarApi;
+ import com.example.picar.retrofit.Position;
+-import com.example.picar.retrofit.User;
+-import com.example.picar.retrofit.UserInfo;
+-import com.example.picar.retrofit.UserLogin;
++import com.example.picar.retrofit.UserDataFormat.User;
++import com.example.picar.retrofit.UserDataFormat.UserInfo;
++import com.example.picar.retrofit.UserDataFormat.UserLogin;
+ 
+ import java.util.List;
+ 
+Index: app/src/main/java/com/example/picar/retrofit/PiCarApi.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.picar.retrofit;\n\nimport java.util.List;\n\nimport retrofit2.Call;\nimport retrofit2.http.Body;\nimport retrofit2.http.GET;\nimport retrofit2.http.POST;\n\npublic interface PiCarApi {\n\n    @GET(\"user/all\")\n    Call<List<User>> getAllUser();\n\n    @POST(\"user/create\")\n    Call<Message> createUser(@Body User user);\n\n    @POST(\"user\")\n    Call<UserInfo> getUserInfo(@Body UserLogin user);\n\n    @GET(\"position\")\n    Call<List<Position>> getAllPosition();\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/PiCarApi.java	(date 1555106373000)
++++ app/src/main/java/com/example/picar/retrofit/PiCarApi.java	(date 1555121222000)
+@@ -1,5 +1,9 @@
+ package com.example.picar.retrofit;
+ 
++import com.example.picar.retrofit.UserDataFormat.User;
++import com.example.picar.retrofit.UserDataFormat.UserInfo;
++import com.example.picar.retrofit.UserDataFormat.UserLogin;
++
+ import java.util.List;
+ 
+ import retrofit2.Call;
+Index: app/src/main/java/com/example/picar/retrofit/UserInfo.java
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/UserInfo.java	(date 1555106373000)
++++ app/src/main/java/com/example/picar/retrofit/UserDataFormat/UserInfo.java	(date 1555121222000)
+@@ -1,6 +1,6 @@
+-package com.example.picar.retrofit;
++package com.example.picar.retrofit.UserDataFormat;
+ 
+-import java.util.List;
++import com.example.picar.retrofit.UserDataFormat.User;
+ 
+ public class UserInfo {
+     private User user_info;
+Index: app/src/main/java/com/example/picar/retrofit/UserLogin.java
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/UserLogin.java	(date 1555106373000)
++++ app/src/main/java/com/example/picar/retrofit/UserDataFormat/UserLogin.java	(date 1555121222000)
+@@ -1,4 +1,4 @@
+-package com.example.picar.retrofit;
++package com.example.picar.retrofit.UserDataFormat;
+ 
+ public class UserLogin {
+     private String email;

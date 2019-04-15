@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="45dp"
+        android:layout_marginRight="25dp"
+        android:gravity="center_horizontal"
+        android:text="For any questions contact us or visite our web site"
+        android:textAlignment="center"
+        android:textSize="25dp" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:visibility="visible"
+        app:srcCompat="@drawable/phone"
+        android:layout_below="@id/textView"
+        android:layout_alignStart="@id/textView"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/imageView2"
+        android:layout_marginLeft="50dp"
+        android:layout_toEndOf="@id/imageView2"
+        android:text="(514) 111 - 2222"
+        android:textSize="25dp" />
+
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="visible"
+        app:srcCompat="@drawable/domain"
+        android:layout_below="@+id/imageView2"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/imageView3"
+        android:layout_marginLeft="50dp"
+        android:layout_toEndOf="@id/imageView3"
+        android:text="www.picar.com"
+        android:textSize="25dp" />
+</RelativeLayout>

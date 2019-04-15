@@ -9,9 +9,9 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 @Entity(tableName = "users_car",foreignKeys = @ForeignKey(entity = User.class,
-        parentColumns = "user_id",
-        childColumns = "user_id"),
-        indices = {@Index("user_id")})
+        parentColumns = "_id",
+        childColumns = "user_id"))//,
+//        indices = {@Index("_id")})
 public class UserCar {
 
     public UserCar() {
