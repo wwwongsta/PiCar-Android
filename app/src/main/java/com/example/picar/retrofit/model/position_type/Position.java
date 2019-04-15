@@ -1,4 +1,4 @@
-package com.example.picar.retrofit;
+package com.example.picar.retrofit.model.position_type;
 
 public class Position {
 

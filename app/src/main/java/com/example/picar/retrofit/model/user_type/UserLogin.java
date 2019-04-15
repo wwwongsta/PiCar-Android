@@ -1,16 +1,14 @@
-package com.example.picar.retrofit;
+package com.example.picar.retrofit.model.user_type;
 
 public class UserLogin {
     private String email;
     private String password;
-    private boolean token;
 
-    public UserLogin(String email,boolean token) {
+    public UserLogin(String email) {
         this.email = email;
-        this.token = token;
     }
 
-    public UserLogin(String email,boolean token, String password) {
+    public UserLogin(String email, String password) {
         this.email = email;
         this.password = password;
     }
@@ -21,9 +19,5 @@ public class UserLogin {
 
     public String getPassword() {
         return password;
-    }
-
-    public boolean isToken() {
-        return token;
     }
 }

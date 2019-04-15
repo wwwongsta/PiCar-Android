@@ -1,4 +1,4 @@
-package com.example.picar.retrofit;
+package com.example.picar.retrofit.model.user_type;
 
 
 import com.google.gson.annotations.SerializedName;

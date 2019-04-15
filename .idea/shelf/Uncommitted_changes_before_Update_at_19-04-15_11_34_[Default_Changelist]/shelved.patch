@@ -1,0 +1,603 @@
+Index: app/src/main/java/com/example/picar/retrofit/UserHttpQuery.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/UserHttpQuery.java	(date 1555124755000)
++++ app/src/main/java/com/example/picar/retrofit/UserHttpQuery.java	(date 1555124755000)
+@@ -0,0 +1,48 @@
++package com.example.picar.retrofit;
++
++import android.app.Activity;
++import android.util.Log;
++
++import com.example.picar.retrofit.UserDataFormat.User;
++import com.example.picar.retrofit.UserDataFormat.UserInfo;
++import com.example.picar.retrofit.UserDataFormat.UserLogin;
++
++import java.util.List;
++
++import retrofit2.Call;
++import retrofit2.Callback;
++import retrofit2.Response;
++
++public class UserHttpQuery {
++    private PiCarApi api;
++    private HttpUser httpUser;
++    private Activity activity;
++    public static String TAG = "UserHttpQuery";
++
++    public UserHttpQuery(PiCarApi api, Activity activity) {
++        this.api = api;
++        this.activity = activity;
++        try{
++            httpUser = (HttpUser) activity;
++        }catch (ClassCastException e){
++            Log.e(TAG," On attach class cast exception " + e.getMessage());
++        }
++    }
++    public interface HttpUser{
++        void createUserResponse(Response<Message> response);
++        void error(Throwable t);
++    }
++    public void createUser(User user){
++        Call<Message> call = api.createUser(user);
++        call.enqueue(new Callback<Message>() {
++            @Override
++            public void onResponse(Call<Message> call, Response<Message> response) {
++                httpUser.createUserResponse(response);
++            }
++            @Override
++            public void onFailure(Call<Message> call, Throwable t) {
++                httpUser.error(t);
++            }
++        });
++    }
++}
+Index: app/src/main/java/com/example/picar/retrofit/UserInfo.java
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/UserInfo.java	(date 1555122985000)
++++ app/src/main/java/com/example/picar/retrofit/UserDataFormat/UserInfo.java	(date 1555123138000)
+@@ -1,16 +1,16 @@
+-package com.example.picar.retrofit;
++package com.example.picar.retrofit.UserDataFormat;
+ 
+-import java.util.List;
++import com.example.picar.retrofit.UserDataFormat.User;
+ 
+ public class UserInfo {
+     private User user_info;
+-    private boolean token;
++    private String authorization;
+ 
+     public User getUser_info() {
+         return user_info;
+     }
+ 
+-    public boolean isToken() {
+-        return token;
++    public String getAuthorization() {
++        return authorization;
+     }
+ }
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"NullableNotNullManager\">\n    <option name=\"myDefaultNullable\" value=\"android.support.annotation.Nullable\" />\n    <option name=\"myDefaultNotNull\" value=\"android.support.annotation.NonNull\" />\n    <option name=\"myNullables\">\n      <value>\n        <list size=\"7\">\n          <item index=\"0\" class=\"java.lang.String\" itemvalue=\"org.jetbrains.annotations.Nullable\" />\n          <item index=\"1\" class=\"java.lang.String\" itemvalue=\"javax.annotation.Nullable\" />\n          <item index=\"2\" class=\"java.lang.String\" itemvalue=\"javax.annotation.CheckForNull\" />\n          <item index=\"3\" class=\"java.lang.String\" itemvalue=\"edu.umd.cs.findbugs.annotations.Nullable\" />\n          <item index=\"4\" class=\"java.lang.String\" itemvalue=\"android.support.annotation.Nullable\" />\n          <item index=\"5\" class=\"java.lang.String\" itemvalue=\"androidx.annotation.Nullable\" />\n          <item index=\"6\" class=\"java.lang.String\" itemvalue=\"androidx.annotation.RecentlyNullable\" />\n        </list>\n      </value>\n    </option>\n    <option name=\"myNotNulls\">\n      <value>\n        <list size=\"6\">\n          <item index=\"0\" class=\"java.lang.String\" itemvalue=\"org.jetbrains.annotations.NotNull\" />\n          <item index=\"1\" class=\"java.lang.String\" itemvalue=\"javax.annotation.Nonnull\" />\n          <item index=\"2\" class=\"java.lang.String\" itemvalue=\"edu.umd.cs.findbugs.annotations.NonNull\" />\n          <item index=\"3\" class=\"java.lang.String\" itemvalue=\"android.support.annotation.NonNull\" />\n          <item index=\"4\" class=\"java.lang.String\" itemvalue=\"androidx.annotation.NonNull\" />\n          <item index=\"5\" class=\"java.lang.String\" itemvalue=\"androidx.annotation.RecentlyNonNull\" />\n        </list>\n      </value>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_1_8\" project-jdk-name=\"1.8\" project-jdk-type=\"JavaSDK\">\n    <output url=\"file://$PROJECT_DIR$/build/classes\" />\n  </component>\n  <component name=\"ProjectType\">\n    <option name=\"id\" value=\"Android\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/misc.xml	(date 1555122985000)
++++ .idea/misc.xml	(date 1555339639000)
+@@ -5,7 +5,7 @@
+     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />
+     <option name="myNullables">
+       <value>
+-        <list size="7">
++        <list size="10">
+           <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
+           <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
+           <item index="2" class="java.lang.String" itemvalue="javax.annotation.CheckForNull" />
+@@ -13,18 +13,24 @@
+           <item index="4" class="java.lang.String" itemvalue="android.support.annotation.Nullable" />
+           <item index="5" class="java.lang.String" itemvalue="androidx.annotation.Nullable" />
+           <item index="6" class="java.lang.String" itemvalue="androidx.annotation.RecentlyNullable" />
++          <item index="7" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.Nullable" />
++          <item index="8" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableDecl" />
++          <item index="9" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableType" />
+         </list>
+       </value>
+     </option>
+     <option name="myNotNulls">
+       <value>
+-        <list size="6">
++        <list size="9">
+           <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
+           <item index="1" class="java.lang.String" itemvalue="javax.annotation.Nonnull" />
+           <item index="2" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.NonNull" />
+           <item index="3" class="java.lang.String" itemvalue="android.support.annotation.NonNull" />
+           <item index="4" class="java.lang.String" itemvalue="androidx.annotation.NonNull" />
+           <item index="5" class="java.lang.String" itemvalue="androidx.annotation.RecentlyNonNull" />
++          <item index="6" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.NonNull" />
++          <item index="7" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NonNullDecl" />
++          <item index="8" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NonNullType" />
+         </list>
+       </value>
+     </option>
+Index: app/src/main/java/com/example/picar/activities/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.picar.activities;\n\n\nimport android.content.Context;\nimport android.content.Intent;\nimport android.content.SharedPreferences;\nimport android.location.Address;\nimport android.location.Geocoder;\nimport android.os.Bundle;\nimport android.preference.PreferenceManager;\nimport android.support.design.widget.FloatingActionButton;\nimport android.support.design.widget.NavigationView;\nimport android.support.design.widget.Snackbar;\nimport android.support.v4.view.GravityCompat;\nimport android.support.v4.widget.DrawerLayout;\nimport android.support.v7.app.ActionBarDrawerToggle;\nimport android.support.v7.app.AppCompatActivity;\nimport android.support.v7.widget.Toolbar;\nimport android.view.Menu;\nimport android.view.MenuItem;\nimport android.view.View;\nimport android.widget.Button;\n\nimport com.example.picar.R;\n\nimport java.io.IOException;\nimport java.util.List;\nimport java.util.Locale;\n\npublic class MainActivity extends AppCompatActivity\n        implements NavigationView.OnNavigationItemSelectedListener {\n\n    private Bundle extras;\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        checkLogIn();\n\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_main);\n        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);\n        setSupportActionBar(toolbar);\n        /**\n         * Start activity retrofit for test\n         */\n//        Intent i = new Intent(this,RetrofitActivity.class);\n//        startActivity(i);\n        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);\n        fab.setOnClickListener(new View.OnClickListener() {\n            @Override\n            public void onClick(View view) {\n                Snackbar.make(view, \"Replace with your own action\", Snackbar.LENGTH_LONG)\n                        .setAction(\"Action\", null).show();\n            }\n        });\n\n        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);\n        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(\n                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);\n        drawer.addDrawerListener(toggle);\n        toggle.syncState();\n\n        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);\n        navigationView.setNavigationItemSelectedListener(this);\n\n\n        Button passengerButton = (Button) findViewById(R.id.button_passenger);\n        passengerButton.setOnClickListener(new View.OnClickListener() {\n            @Override\n            public void onClick(View v) {\n                startActivity(new Intent(MainActivity.this, MapsActivity.class));\n            }\n        });\n\n        Address address;\n        try {\n            address = getCoordinatesOfAddress(this,\"Montreal\");\n            setTitle(address.getLatitude() + \", \" + address.getLongitude());\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n\n\n    }\n\n    public Address getCoordinatesOfAddress(Context context, String myLocation) throws IOException {\n        Geocoder geocoder = new Geocoder(context, Locale.getDefault());\n        List<Address> addresses = geocoder.getFromLocationName(myLocation, 1);\n        Address address = addresses.get(0);\n\n        return address;\n    }\n\n\n    public boolean checkLogIn(){\n        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);\n        boolean stayLoggedIn = sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false);\n\n\n        extras = getIntent().getExtras();\n\n        if(stayLoggedIn != true){\n            startActivity(new Intent(MainActivity.this, LoginActivity.class));\n        }\n        return stayLoggedIn;\n    }\n\n    @Override\n    public void onBackPressed() {\n        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);\n        if (drawer.isDrawerOpen(GravityCompat.START)) {\n            drawer.closeDrawer(GravityCompat.START);\n        } else {\n            super.onBackPressed();\n        }\n    }\n\n    @Override\n    public boolean onCreateOptionsMenu(Menu menu) {\n        // Inflate the menu; this adds items to the action bar if it is present.\n        getMenuInflater().inflate(R.menu.main, menu);\n        return true;\n    }\n\n    @Override\n    public boolean onOptionsItemSelected(MenuItem item) {\n        // Handle action bar item clicks here. The action bar will\n        // automatically handle clicks on the Home/Up button, so long\n        // as you specify a parent activity in AndroidManifest.xml.\n        int id = item.getItemId();\n\n        //noinspection SimplifiableIfStatement\n        if (id == R.id.action_settings) {\n            return true;\n        }\n\n        return super.onOptionsItemSelected(item);\n    }\n\n    @SuppressWarnings(\"StatementWithEmptyBody\")\n    @Override\n    public boolean onNavigationItemSelected(MenuItem item) {\n        // Handle navigation view item clicks here.\n        int id = item.getItemId();\n\n        if (id == R.id.nav_help) {\n            // Handle the camera action\n        } else if (id == R.id.nav_your_trips) {\n\n        } else if (id == R.id.nav_payment) {\n\n        } else if (id == R.id.nav_about) {\n\n        } else if (id == R.id.nav_settings){\n            startActivity(new Intent(MainActivity.this, SettingsActivity.class));\n            return true;\n\n        }\n\n        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);\n        drawer.closeDrawer(GravityCompat.START);\n        return true;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/picar/activities/MainActivity.java	(date 1555122985000)
++++ app/src/main/java/com/example/picar/activities/MainActivity.java	(date 1555124778000)
+@@ -43,8 +43,8 @@
+         /**
+          * Start activity retrofit for test
+          */
+-//        Intent i = new Intent(this,RetrofitActivity.class);
+-//        startActivity(i);
++        Intent i = new Intent(this,RetrofitActivity.class);
++        startActivity(i);
+         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+         fab.setOnClickListener(new View.OnClickListener() {
+             @Override
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"GradleSettings\">\n    <option name=\"linkedExternalProjectsSettings\">\n      <GradleProjectSettings>\n        <option name=\"distributionType\" value=\"DEFAULT_WRAPPED\" />\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\n        <option name=\"modules\">\n          <set>\n            <option value=\"$PROJECT_DIR$\" />\n            <option value=\"$PROJECT_DIR$/app\" />\n          </set>\n        </option>\n        <option name=\"resolveModulePerSourceSet\" value=\"false\" />\n      </GradleProjectSettings>\n    </option>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/gradle.xml	(date 1555122985000)
++++ .idea/gradle.xml	(date 1555125157000)
+@@ -3,6 +3,9 @@
+   <component name="GradleSettings">
+     <option name="linkedExternalProjectsSettings">
+       <GradleProjectSettings>
++        <compositeConfiguration>
++          <compositeBuild compositeDefinitionSource="SCRIPT" />
++        </compositeConfiguration>
+         <option name="distributionType" value="DEFAULT_WRAPPED" />
+         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+         <option name="modules">
+Index: app/src/main/java/com/example/picar/activities/LoginActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.picar.activities;\n\n\nimport android.animation.Animator;\nimport android.animation.AnimatorListenerAdapter;\nimport android.annotation.TargetApi;\nimport android.app.LoaderManager.LoaderCallbacks;\nimport android.content.Context;\nimport android.content.CursorLoader;\nimport android.content.Loader;\nimport android.content.SharedPreferences;\nimport android.content.pm.PackageManager;\nimport android.database.Cursor;\nimport android.net.Uri;\nimport android.os.AsyncTask;\nimport android.os.Build;\nimport android.os.Bundle;\nimport android.provider.ContactsContract;\nimport android.support.annotation.NonNull;\nimport android.support.design.widget.Snackbar;\nimport android.support.v7.app.AppCompatActivity;\nimport android.text.TextUtils;\nimport android.util.Log;\nimport android.view.KeyEvent;\nimport android.view.View;\nimport android.view.View.OnClickListener;\nimport android.view.inputmethod.EditorInfo;\nimport android.widget.ArrayAdapter;\nimport android.widget.AutoCompleteTextView;\nimport android.widget.Button;\nimport android.widget.CheckBox;\nimport android.widget.CompoundButton;\nimport android.widget.EditText;\nimport android.widget.TextView;\n\nimport com.example.picar.R;\nimport com.example.picar.retrofit.PiCarApi;\nimport com.example.picar.retrofit.User;\n\nimport java.util.ArrayList;\nimport java.util.List;\n\nimport retrofit2.Call;\nimport retrofit2.Callback;\nimport retrofit2.Response;\nimport retrofit2.Retrofit;\nimport retrofit2.converter.gson.GsonConverterFactory;\n\nimport static android.Manifest.permission.READ_CONTACTS;\n\n/**\n * A login screen that offers login via email/password.\n */\npublic class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {\n\n    /**\n     * Id to identity READ_CONTACTS permission request.\n     */\n    private static final int REQUEST_READ_CONTACTS = 0;\n\n    /**\n     * A dummy authentication store containing known user names and passwords.\n     * TODO: remove after connecting to a real authentication system.\n     */\n    private static final String[] DUMMY_CREDENTIALS = new String[]{\n            \"foo@example.com:hello\", \"bar@example.com:world\"\n    };\n    private static final String TAG = \"JSON\";\n    /**\n     * Keep track of the login task to ensure we can cancel it if requested.\n     */\n    private UserLoginTask mAuthTask = null;\n\n    // UI references.\n    private AutoCompleteTextView mEmailView;\n    private EditText mPasswordView;\n    private CheckBox mLoggedInCheckbox;\n    private View mProgressView;\n    private View mLoginFormView;\n    private String userEmail;\n    private String userPassWord;\n\n\n    private TextView afficheApi;\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_login);\n        afficheApi = findViewById(R.id.content);\n        // Set up the login form.\n        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);\n        populateAutoComplete();\n\n        mPasswordView = (EditText) findViewById(R.id.password);\n        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {\n            @Override\n            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {\n                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {\n                    attemptLogin();\n                    return true;\n                }\n                return false;\n            }\n        });\n\n        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);\n        mEmailSignInButton.setOnClickListener(new OnClickListener() {\n            @Override\n            public void onClick(View view) {\n                attemptLogin();\n            }\n        });\n\n\n        mLoggedInCheckbox = (CheckBox) findViewById(R.id.checkBox_stay_logged_in);\n        mLoggedInCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {\n            @Override\n            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {\n                SharedPreferences prefs = getSharedPreferences(getApplicationContext().getPackageName(), Context.MODE_PRIVATE);\n\n                if (mLoggedInCheckbox.isChecked()) {\n                    prefs.edit().putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, true).commit();\n                } else {\n                    prefs.edit().putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false).commit();\n                }\n            }\n        });\n\n        mLoginFormView = findViewById(R.id.login_form);\n        mProgressView = findViewById(R.id.login_progress);\n    }\n\n    private void populateAutoComplete() {\n        if (!mayRequestContacts()) {\n            return;\n        }\n\n        getLoaderManager().initLoader(0, null, this);\n    }\n\n    private boolean mayRequestContacts() {\n        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {\n            return true;\n        }\n        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {\n            return true;\n        }\n        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {\n            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)\n                    .setAction(android.R.string.ok, new View.OnClickListener() {\n                        @Override\n                        @TargetApi(Build.VERSION_CODES.M)\n                        public void onClick(View v) {\n                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);\n                        }\n                    });\n        } else {\n            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);\n        }\n        return false;\n    }\n\n    /**\n     * Callback received when a permissions request has been completed.\n     */\n    @Override\n    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,\n                                           @NonNull int[] grantResults) {\n        if (requestCode == REQUEST_READ_CONTACTS) {\n            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {\n                populateAutoComplete();\n            }\n        }\n    }\n\n\n    /**\n     * Attempts to sign in or register the account specified by the login form.\n     * If there are form errors (invalid email, missing fields, etc.), the\n     * errors are presented and no actual login attempt is made.\n     */\n    private void attemptLogin() {\n        if (mAuthTask != null) {\n            return;\n        }\n\n        // Reset errors.\n        mEmailView.setError(null);\n        mPasswordView.setError(null);\n\n        // Store values at the time of the login attempt.\n        String email = mEmailView.getText().toString();\n        String password = mPasswordView.getText().toString();\n\n        boolean cancel = false;\n        View focusView = null;\n\n        // Check for a valid password, if the user entered one.\n        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {\n            mPasswordView.setError(getString(R.string.error_invalid_password));\n            focusView = mPasswordView;\n            cancel = true;\n        }\n\n        // Check for a valid email address.\n        if (TextUtils.isEmpty(email)) {\n            mEmailView.setError(getString(R.string.error_field_required));\n            focusView = mEmailView;\n            cancel = true;\n        } else if (!isEmailValid(email)) {\n            mEmailView.setError(getString(R.string.error_invalid_email));\n            focusView = mEmailView;\n            cancel = true;\n        }\n\n        if (cancel) {\n            // There was an error; don't attempt login and focus the first\n            // form field with an error.\n            focusView.requestFocus();\n        } else {\n            // Show a progress spinner, and kick off a background task to\n            // perform the user login attempt.\n            showProgress(true);\n            mAuthTask = new UserLoginTask(email, password);\n            mAuthTask.execute((Void) null);\n        }\n    }\n\n    private boolean isEmailValid(String email) {\n        //TODO: Replace this with your own logic\n         PiCarApi api;\n        Retrofit retrofit = new Retrofit.Builder()\n                .baseUrl(\"https://cryptic-stream-69346.herokuapp.com/\")\n                .addConverterFactory(GsonConverterFactory.create())\n                .build();\n        api = retrofit.create(PiCarApi.class);\n        Call<List<User>> call = api.getAllUser();\n        call.enqueue(new Callback<List<User>>() {\n            @Override\n            public void onResponse(Call<List<User>> call, Response<List<User>> response) {\n                if(!response.isSuccessful()){\n                    afficheApi.setText(\"code : \"+ response.code());\n                    Log.i(\"RETROFIT\",\"code : \"+ response.code());\n                    return;\n                }\n                List<User> users = response.body();\n                for (User user:users){\n                    String content = \"\";\n                    content += \"Email :\" + user.getEmail() + \"\\n\";\n                    content += \"Password :\"+ user.getPassword()+\"\\n\";\n                    afficheApi.append(content);\n                    Log.i(\"RETROFIT\",content);\n                }\n            }\n\n            @Override\n            public void onFailure(Call<List<User>> call, Throwable t) {\n                afficheApi.setText(t.getMessage());\n                Log.i(\"RETROFIT\",t.getMessage());\n            }\n        });\n\n        Log.i(\"RETROFIT\",\"Message Test\");\n\n\n\n        return email.contains(\"@\");\n    }\n\n    private boolean isPasswordValid(String password) {\n        //TODO: Replace this with your own logic\n        return password.length() > 4;\n    }\n\n    /**\n     * Shows the progress UI and hides the login form.\n     */\n    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)\n    private void showProgress(final boolean show) {\n        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow\n        // for very easy animations. If available, use these APIs to fade-in\n        // the progress spinner.\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {\n            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);\n\n            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);\n            mLoginFormView.animate().setDuration(shortAnimTime).alpha(\n                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {\n                @Override\n                public void onAnimationEnd(Animator animation) {\n                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);\n                }\n            });\n\n            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);\n            mProgressView.animate().setDuration(shortAnimTime).alpha(\n                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {\n                @Override\n                public void onAnimationEnd(Animator animation) {\n                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);\n                }\n            });\n        } else {\n            // The ViewPropertyAnimator APIs are not available, so simply show\n            // and hide the relevant UI components.\n            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);\n            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);\n        }\n    }\n\n    @Override\n    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {\n        return new CursorLoader(this,\n                // Retrieve data rows for the device user's 'profile' contact.\n                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,\n                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,\n\n                // Select only email addresses.\n                ContactsContract.Contacts.Data.MIMETYPE +\n                        \" = ?\", new String[]{ContactsContract.CommonDataKinds.Email\n                .CONTENT_ITEM_TYPE},\n\n                // Show primary email addresses first. Note that there won't be\n                // a primary email address if the user hasn't specified one.\n                ContactsContract.Contacts.Data.IS_PRIMARY + \" DESC\");\n    }\n\n    @Override\n    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {\n        List<String> emails = new ArrayList<>();\n        cursor.moveToFirst();\n        while (!cursor.isAfterLast()) {\n            emails.add(cursor.getString(ProfileQuery.ADDRESS));\n            cursor.moveToNext();\n        }\n\n        addEmailsToAutoComplete(emails);\n    }\n\n    @Override\n    public void onLoaderReset(Loader<Cursor> cursorLoader) {\n\n    }\n\n    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {\n        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.\n        ArrayAdapter<String> adapter =\n                new ArrayAdapter<>(LoginActivity.this,\n                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);\n\n        mEmailView.setAdapter(adapter);\n    }\n\n\n    private interface ProfileQuery {\n        String[] PROJECTION = {\n                ContactsContract.CommonDataKinds.Email.ADDRESS,\n                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,\n        };\n\n        int ADDRESS = 0;\n        int IS_PRIMARY = 1;\n    }\n\n    /**\n     * Represents an asynchronous login/registration task used to authenticate\n     * the user.\n     */\n    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {\n\n        private final String mEmail;\n        private final String mPassword;\n\n        UserLoginTask(String email, String password) {\n            mEmail = email;\n            mPassword = password;\n        }\n\n        @Override\n        protected Boolean doInBackground(Void... params) {\n            // TODO: attempt authentication against a network service.\n            try {\n                // Simulate network access.\n                Thread.sleep(2000);\n            } catch (InterruptedException e) {\n                return false;\n            }\n\n            for (String credential : DUMMY_CREDENTIALS) {\n                String[] pieces = credential.split(\":\");\n                if (pieces[0].equals(mEmail)) {\n                    // Account exists, return true if the password matches.\n                    return pieces[1].equals(mPassword);\n                }\n            }\n\n            // TODO: register the new account here.\n            return true;\n        }\n\n        @Override\n        protected void onPostExecute(final Boolean success) {\n            mAuthTask = null;\n            showProgress(false);\n\n            if (success) {\n                finish();\n            } else {\n                mPasswordView.setError(getString(R.string.error_incorrect_password));\n                mPasswordView.requestFocus();\n            }\n        }\n\n        @Override\n        protected void onCancelled() {\n            mAuthTask = null;\n            showProgress(false);\n        }\n    }\n\n\n}\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/picar/activities/LoginActivity.java	(date 1555122985000)
++++ app/src/main/java/com/example/picar/activities/LoginActivity.java	(date 1555123437000)
+@@ -35,7 +35,7 @@
+ 
+ import com.example.picar.R;
+ import com.example.picar.retrofit.PiCarApi;
+-import com.example.picar.retrofit.User;
++import com.example.picar.retrofit.UserDataFormat.User;
+ 
+ import java.util.ArrayList;
+ import java.util.List;
+Index: app/src/main/java/com/example/picar/activities/RetrofitActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.picar.activities;\n\nimport android.support.v7.app.AppCompatActivity;\nimport android.os.Bundle;\nimport android.widget.TextView;\n\nimport com.example.picar.R;\nimport com.example.picar.retrofit.Message;\nimport com.example.picar.retrofit.PiCarApi;\nimport com.example.picar.retrofit.Position;\nimport com.example.picar.retrofit.User;\nimport com.example.picar.retrofit.UserInfo;\nimport com.example.picar.retrofit.UserLogin;\n\nimport java.util.List;\n\nimport retrofit2.Call;\nimport retrofit2.Callback;\nimport retrofit2.Response;\nimport retrofit2.Retrofit;\nimport retrofit2.converter.gson.GsonConverterFactory;\n\npublic class RetrofitActivity extends AppCompatActivity {\n    TextView tx;\n    private PiCarApi api;\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_retrofit);\n        tx = (TextView) findViewById(R.id.retrofitTest);\n        Retrofit retrofit = new Retrofit.Builder()\n                .baseUrl(\"https://cryptic-stream-69346.herokuapp.com/\")\n                .addConverterFactory(GsonConverterFactory.create())\n                .build();\n        api = retrofit.create(PiCarApi.class);\n        getuser();\n//       getusers();\n       // getAllPosition();\n//       createUser();\n    }\n    private void getuser(){\n        UserLogin user = new UserLogin(\"test@gmail.com\",true);\n        Call<UserInfo> call = api.getUserInfo(user);\n        call.enqueue(new Callback<UserInfo>() {\n            @Override\n            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {\n                if(!response.isSuccessful()){\n                    tx.setText(\"code : \"+ response.code());\n                    return;\n                }\n                UserInfo userInfo = response.body();\n                String content = \"\";\n                content += \"Email : \"+ userInfo.getUser_info().getEmail() + \"\\n\";\n                content += \"Name : \"+ userInfo.getUser_info().getName();\n                tx.append(content);\n            }\n\n            @Override\n            public void onFailure(Call<UserInfo> call, Throwable t) {\n                tx.setText(t.getMessage());\n            }\n        });\n    }\n    private void createUser(){\n        User user = new User(\"test@gmail.com\",\"aPassword\",\"FamilyName\",\"Name\",562398741);\n        Call<Message> call = api.createUser(user);\n        call.enqueue(new Callback<Message>() {\n\n            @Override\n            public void onResponse(Call<Message> call, Response<Message> response) {\n                if(!response.isSuccessful()){\n                    tx.setText(\"code : \"+ response.code());\n                    return;\n                }\n                Message mes = response.body();\n                String content = \"\";\n                content += \"Message : \"+ mes.getMessage();\n                tx.append(content);\n            }\n\n            @Override\n            public void onFailure(Call<Message> call, Throwable t) {\n                tx.setText(t.getMessage());\n            }\n        });\n    }\n    private void getAllPosition(){\n        Call<List<Position>> call = api.getAllPosition();\n        call.enqueue(new Callback<List<Position>>() {\n            @Override\n            public void onResponse(Call<List<Position>> call, Response<List<Position>> response) {\n                if(!response.isSuccessful()){\n                    tx.setText(\"code : \"+ response.code());\n                    return;\n                }\n                List<Position> positions = response.body();\n                for (Position position:positions){\n                    String content = \"\";\n                    content += \"Lat :\" + position.getLat() + \"\\n\";\n                    content += \"Lng :\"+ position.getLng()+\"\\n\";\n                    tx.append(content);\n                }\n\n            }\n\n            @Override\n            public void onFailure(Call<List<Position>> call, Throwable t) {\n                tx.setText(t.getMessage());\n            }\n        });\n    }\n    private void getusers(){\n        Call<List<User>> call = api.getAllUser();\n        call.enqueue(new Callback<List<User>>() {\n            @Override\n            public void onResponse(Call<List<User>> call, Response<List<User>> response) {\n                if(!response.isSuccessful()){\n                    tx.setText(\"code : \"+ response.code());\n                    return;\n                }\n                List<User> users = response.body();\n                for (User user:users){\n                    String content = \"\";\n                    content += \"Email :\" + user.getEmail() + \"\\n\";\n                    content += \"Password :\"+ user.getPassword()+\"\\n\";\n                    tx.append(content);\n                }\n            }\n\n            @Override\n            public void onFailure(Call<List<User>> call, Throwable t) {\n                tx.setText(t.getMessage());\n            }\n        });\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/picar/activities/RetrofitActivity.java	(date 1555122985000)
++++ app/src/main/java/com/example/picar/activities/RetrofitActivity.java	(date 1555340242000)
+@@ -8,129 +8,154 @@
+ import com.example.picar.retrofit.Message;
+ import com.example.picar.retrofit.PiCarApi;
+ import com.example.picar.retrofit.Position;
+-import com.example.picar.retrofit.User;
+-import com.example.picar.retrofit.UserInfo;
+-import com.example.picar.retrofit.UserLogin;
++import com.example.picar.retrofit.UserDataFormat.User;
++import com.example.picar.retrofit.UserDataFormat.UserInfo;
++import com.example.picar.retrofit.UserDataFormat.UserLogin;
++import com.example.picar.retrofit.UserHttpQuery;
+ 
+ import java.util.List;
+ 
++import okhttp3.OkHttpClient;
+ import retrofit2.Call;
+ import retrofit2.Callback;
+ import retrofit2.Response;
+ import retrofit2.Retrofit;
+ import retrofit2.converter.gson.GsonConverterFactory;
+ 
+-public class RetrofitActivity extends AppCompatActivity {
++public class RetrofitActivity extends AppCompatActivity implements UserHttpQuery.HttpUser{
+     TextView tx;
+     private PiCarApi api;
++    UserHttpQuery userHttpQuery;
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_retrofit);
+         tx = (TextView) findViewById(R.id.retrofitTest);
++
+         Retrofit retrofit = new Retrofit.Builder()
+                 .baseUrl("https://cryptic-stream-69346.herokuapp.com/")
+                 .addConverterFactory(GsonConverterFactory.create())
+                 .build();
+         api = retrofit.create(PiCarApi.class);
+-        getuser();
++        User user = new User("696@gmail.com","aPassword","FamilyName","Name",562398741);
++        userHttpQuery = new UserHttpQuery(api,this);
++        userHttpQuery.createUser(user);
++//        getuser();
+ //       getusers();
+        // getAllPosition();
+ //       createUser();
+     }
+-    private void getuser(){
+-        UserLogin user = new UserLogin("test@gmail.com",true);
+-        Call<UserInfo> call = api.getUserInfo(user);
+-        call.enqueue(new Callback<UserInfo>() {
+-            @Override
+-            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+-                if(!response.isSuccessful()){
+-                    tx.setText("code : "+ response.code());
+-                    return;
+-                }
+-                UserInfo userInfo = response.body();
+-                String content = "";
+-                content += "Email : "+ userInfo.getUser_info().getEmail() + "\n";
+-                content += "Name : "+ userInfo.getUser_info().getName();
+-                tx.append(content);
+-            }
+-
+-            @Override
+-            public void onFailure(Call<UserInfo> call, Throwable t) {
+-                tx.setText(t.getMessage());
+-            }
+-        });
+-    }
+-    private void createUser(){
+-        User user = new User("test@gmail.com","aPassword","FamilyName","Name",562398741);
+-        Call<Message> call = api.createUser(user);
+-        call.enqueue(new Callback<Message>() {
+-
+-            @Override
+-            public void onResponse(Call<Message> call, Response<Message> response) {
+-                if(!response.isSuccessful()){
+-                    tx.setText("code : "+ response.code());
+-                    return;
+-                }
+-                Message mes = response.body();
+-                String content = "";
+-                content += "Message : "+ mes.getMessage();
+-                tx.append(content);
+-            }
+-
+-            @Override
+-            public void onFailure(Call<Message> call, Throwable t) {
+-                tx.setText(t.getMessage());
+-            }
+-        });
+-    }
+-    private void getAllPosition(){
+-        Call<List<Position>> call = api.getAllPosition();
+-        call.enqueue(new Callback<List<Position>>() {
+-            @Override
+-            public void onResponse(Call<List<Position>> call, Response<List<Position>> response) {
+-                if(!response.isSuccessful()){
+-                    tx.setText("code : "+ response.code());
+-                    return;
+-                }
+-                List<Position> positions = response.body();
+-                for (Position position:positions){
+-                    String content = "";
+-                    content += "Lat :" + position.getLat() + "\n";
+-                    content += "Lng :"+ position.getLng()+"\n";
+-                    tx.append(content);
+-                }
++
++    @Override
++    public void createUserResponse(Response<Message> response) {
++        if(response.raw().code() >300 || response.raw().code() <200 ){
++            tx.setText("code : "+ response.raw().code());
++            return;
++        }
++        Message mes = response.body();
++        String content = "";
++        content += "Message : "+ mes.getMessage();
++        tx.append(content);
++    }
+ 
+-            }
+-
+-            @Override
+-            public void onFailure(Call<List<Position>> call, Throwable t) {
++    @Override
++    public void error(Throwable t) {
+                 tx.setText(t.getMessage());
+-            }
+-        });
+     }
+-    private void getusers(){
+-        Call<List<User>> call = api.getAllUser();
+-        call.enqueue(new Callback<List<User>>() {
+-            @Override
+-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+-                if(!response.isSuccessful()){
+-                    tx.setText("code : "+ response.code());
+-                    return;
+-                }
+-                List<User> users = response.body();
+-                for (User user:users){
+-                    String content = "";
+-                    content += "Email :" + user.getEmail() + "\n";
+-                    content += "Password :"+ user.getPassword()+"\n";
+-                    tx.append(content);
+-                }
+-            }
+-
+-            @Override
+-            public void onFailure(Call<List<User>> call, Throwable t) {
+-                tx.setText(t.getMessage());
+-            }
+-        });
+-    }
++//    private void getuser(){
++//        UserLogin user = new UserLogin("test@gmail.com","");
++//        Call<UserInfo> call = api.getUserInfo(user);
++//        call.enqueue(new Callback<UserInfo>() {
++//            @Override
++//            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
++//                if(!response.isSuccessful()){
++//                    tx.setText("code : "+ response.code());
++//                    return;
++//                }
++//
++//                UserInfo userInfo = response.body();
++//                String content = "";
++//                content += "Email : "+ userInfo.getUser_info().getEmail() + "\n";
++//                content += "Name : "+ userInfo.getUser_info().getName();
++//                tx.append(content);
++//            }
++//
++//            @Override
++//            public void onFailure(Call<UserInfo> call, Throwable t) {
++//                tx.setText(t.getMessage());
++//            }
++//        });
++//    }
++//    private void createUser(){
++//        User user = new User("test@gmail.com","aPassword","FamilyName","Name",562398741);
++//        Call<Message> call = api.createUser(user);
++//        call.enqueue(new Callback<Message>() {
++//
++//            @Override
++//            public void onResponse(Call<Message> call, Response<Message> response) {
++//                if(!response.isSuccessful()){
++//                    tx.setText("code : "+ response.code());
++//                    return;
++//                }
++//                Message mes = response.body();
++//                String content = "";
++//                content += "Message : "+ mes.getMessage();
++//                tx.append(content);
++//            }
++//
++//            @Override
++//            public void onFailure(Call<Message> call, Throwable t) {
++//                tx.setText(t.getMessage());
++//            }
++//        });
++//    }
++//    private void getAllPosition(){
++//        Call<List<Position>> call = api.getAllPosition();
++//        call.enqueue(new Callback<List<Position>>() {
++//            @Override
++//            public void onResponse(Call<List<Position>> call, Response<List<Position>> response) {
++//                if(!response.isSuccessful()){
++//                    tx.setText("code : "+ response.code());
++//                    return;
++//                }
++//                List<Position> positions = response.body();
++//                for (Position position:positions){
++//                    String content = "";
++//                    content += "Lat :" + position.getLat() + "\n";
++//                    content += "Lng :"+ position.getLng()+"\n";
++//                    tx.append(content);
++//                }
++//
++//            }
++//
++//            @Override
++//            public void onFailure(Call<List<Position>> call, Throwable t) {
++//                tx.setText(t.getMessage());
++//            }
++//        });
++//    }
++//    private void getusers(){
++//        Call<List<User>> call = api.getAllUser();
++//        call.enqueue(new Callback<List<User>>() {
++//            @Override
++//            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
++//                if(!response.isSuccessful()){
++//                    tx.setText("code : "+ response.code());
++//                    return;
++//                }
++//                List<User> users = response.body();
++//                for (User user:users){
++//                    String content = "";
++//                    content += "Email :" + user.getEmail() + "\n";
++//                    content += "Password :"+ user.getPassword()+"\n";
++//                    tx.append(content);
++//                }
++//            }
++//
++//            @Override
++//            public void onFailure(Call<List<User>> call, Throwable t) {
++//                tx.setText(t.getMessage());
++//            }
++//        });
++//    }
+ }
+Index: app/src/main/java/com/example/picar/retrofit/PiCarApi.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.picar.retrofit;\n\nimport java.util.List;\n\nimport retrofit2.Call;\nimport retrofit2.http.Body;\nimport retrofit2.http.GET;\nimport retrofit2.http.POST;\nimport retrofit2.http.Header;\nimport retrofit2.http.PUT;\nimport retrofit2.http.Path;\n\n\npublic interface PiCarApi {\n\n    @GET(\"user/all\")\n    Call<List<User>> getAllUser();\n\n    @POST(\"user/create\")\n    Call<Message> createUser(@Body User user);\n\n    @POST(\"user\")\n    Call<UserInfo> getUserInfo(@Body UserLogin user);\n\n    @GET(\"position\")\n\n    @GET(\"user\")\n    Call<User> getUser(@Header(\"email\") String email);\n\n    @GET(\"position/\")\n    Call<List<Position>> getAllPosition();\n\n    @PUT(\"position/{id}\")\n    Call<Position> putPosition(@Path(\"id\") String id, @Body Position position);\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/PiCarApi.java	(date 1555122985000)
++++ app/src/main/java/com/example/picar/retrofit/PiCarApi.java	(date 1555342424000)
+@@ -1,5 +1,9 @@
+ package com.example.picar.retrofit;
+ 
++import com.example.picar.retrofit.UserDataFormat.User;
++import com.example.picar.retrofit.UserDataFormat.UserInfo;
++import com.example.picar.retrofit.UserDataFormat.UserLogin;
++
+ import java.util.List;
+ 
+ import retrofit2.Call;
+@@ -19,18 +23,22 @@
+     @POST("user/create")
+     Call<Message> createUser(@Body User user);
+ 
++    @POST("user/emailCheck")
++    Call<Message> emailCheck(@Body User UserLogin);
++
+     @POST("user")
+-    Call<UserInfo> getUserInfo(@Body UserLogin user);
++    Call<UserInfo> getUserInfo(@Header("authorization") String token,@Body UserLogin user);
+ 
+-    @GET("position")
+-
+-    @GET("user")
+-    Call<User> getUser(@Header("email") String email);
++    @POST("user/login")
++    Call<UserInfo> login(@Header("authorization") String token,@Body UserLogin user);
+ 
+     @GET("position/")
+     Call<List<Position>> getAllPosition();
+ 
+     @PUT("position/{id}")
+-    Call<Position> putPosition(@Path("id") String id, @Body Position position);
++    Call<Position> putPosition(@Path("id") String id,@Header("authorization") String token, @Body Position position);
++
++    @GET("position/{id}")
++    Call<Position> putPosition(@Path("id") String id,@Header("authorization") String token);
+ 
+ }
+Index: app/src/main/java/com/example/picar/database/entity/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.picar.database.entity;\n\n\nimport android.arch.persistence.room.ColumnInfo;\nimport android.arch.persistence.room.Entity;\nimport android.arch.persistence.room.ForeignKey;\nimport android.arch.persistence.room.Ignore;\nimport android.arch.persistence.room.PrimaryKey;\nimport android.support.annotation.NonNull;\n\n\n@Entity(tableName = \"users\")\npublic class User {\n\n    public User() {\n    }\n\n\n    @Ignore\n    public User(int id, int payement_id, String name, String family_name,\n                String cell, String email, String password, String user_photo, String current_position_id, String destination_id) {\n        this.id = id;\n        this.current_position_id=current_position_id;\n        this.destination_id=destination_id;\n        this.payement_id = payement_id;\n        this.family_name = family_name;\n        this.name = name;\n        this.cell = cell;\n        this.email = email;\n        this.password = password;\n        this.user_photo = user_photo;\n    }\n//\n//    @Override\n//    public String toString() {\n//        return\n//                \"id= \" + id + \" position = \" + position + \" payement_id= \" + payement_id + \" name= \" + name + \" family_name= \" + family_name + \" cell= \" + cell + \" email= \" + email + \" password= \" + password + \" user_photo= \" + user_photo;\n//    }\n\n\n    @PrimaryKey\n    @ColumnInfo(name = \"user_id\")\n    private int id;\n\n    @ColumnInfo(name = \"current_position_id\")\n    private String current_position_id;\n\n    @ColumnInfo(name = \"destination_id\")\n    private String destination_id;\n\n    @ColumnInfo(name = \"payement_id\")\n    private int payement_id;\n\n    @ColumnInfo(name = \"name\")\n    private String name;\n\n    @ColumnInfo(name = \"family_name\")\n    private String family_name;\n\n    @ColumnInfo(name = \"cell\")\n    private String cell;\n\n    @ColumnInfo(name = \"email\")\n    private String email;\n\n    @ColumnInfo(name = \"password\")\n    private String password;\n\n    @ColumnInfo(name = \"user_photo\")\n    private String user_photo;\n\n\n\n    public int getId() {\n        return id;\n    }\n\n    public void setId(int id) {\n        this.id = id;\n    }\n\n    public int getPayement_id() {\n        return payement_id;\n    }\n\n    public void setPayement_id(int payement_id) {\n        this.payement_id = payement_id;\n    }\n\n    public String getFamily_name() {\n        return family_name;\n    }\n\n    public void setFamily_name(String family_name) {\n        this.family_name = family_name;\n    }\n\n    public String getName() {\n        return name;\n    }\n\n    public void setName(String name) {\n        this.name = name;\n    }\n\n    public String getCell() {\n        return cell;\n    }\n\n    public void setCell(String cell) {\n        this.cell = cell;\n    }\n\n    public String getEmail() {\n        return email;\n    }\n\n    public void setEmail(String email) {\n        this.email = email;\n    }\n\n    public String getPassword() {\n        return password;\n    }\n\n    public void setPassword(String password) {\n        this.password = password;\n    }\n\n    public String getUser_photo() {\n        return user_photo;\n    }\n\n    public void setUser_photo(String user_photo) {\n        this.user_photo = user_photo;\n    }\n\n    public String getCurrent_position_id() {\n        return current_position_id;\n    }\n\n    public void setCurrent_position_id(String current_position_id) {\n        this.current_position_id = current_position_id;\n    }\n\n    public String getDestination_id() {\n        return destination_id;\n    }\n\n    public void setDestination_id(String destination_id) {\n        this.destination_id = destination_id;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/picar/database/entity/User.java	(date 1555122985000)
++++ app/src/main/java/com/example/picar/database/entity/User.java	(date 1555123388000)
+@@ -15,7 +15,6 @@
+     public User() {
+     }
+ 
+-
+     @Ignore
+     public User(int id, int payement_id, String name, String family_name,
+                 String cell, String email, String password, String user_photo, String current_position_id, String destination_id) {
+@@ -30,13 +29,6 @@
+         this.password = password;
+         this.user_photo = user_photo;
+     }
+-//
+-//    @Override
+-//    public String toString() {
+-//        return
+-//                "id= " + id + " position = " + position + " payement_id= " + payement_id + " name= " + name + " family_name= " + family_name + " cell= " + cell + " email= " + email + " password= " + password + " user_photo= " + user_photo;
+-//    }
+-
+ 
+     @PrimaryKey
+     @ColumnInfo(name = "user_id")
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>apply plugin: 'com.android.application'\n\nandroid {\n    dataBinding {\n        enabled = true\n    }\n    compileSdkVersion 28\n    defaultConfig {\n        applicationId \"com.example.picar\"\n        minSdkVersion 26\n        targetSdkVersion 28\n        versionCode 1\n        versionName \"0.0\"\n        testInstrumentationRunner \"android.support.test.runner.AndroidJUnitRunner\"\n    }\n    buildTypes {\n        release {\n            minifyEnabled false\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n        }\n    }\n}\n\ndependencies {\n    implementation fileTree(include: ['*.jar'], dir: 'libs')\n    implementation 'com.android.support:appcompat-v7:28.0.0'\n    implementation 'com.android.support:design:28.0.0'\n    implementation 'com.android.support:mediarouter-v7:28.0.0'\n    implementation 'com.android.support:preference-v7:28.0.0'\n    implementation 'com.android.support:recyclerview-v7:28.0.0'\n    implementation 'com.android.support.constraint:constraint-layout:1.1.3'\n    implementation 'com.android.support:support-v4:28.0.0'\n    testImplementation 'junit:junit:4.12'\n    implementation 'android.arch.persistence.room:runtime:1.1.1'\n    annotationProcessor \"android.arch.persistence.room:compiler:1.1.1\"\n    testImplementation 'android.arch.persistence.room:testing:1.0.0'\n    implementation 'android.arch.persistence.room:rxjava2:1.0.0'\n    implementation 'android.arch.lifecycle:extensions:1.1.0'\n    implementation 'android.arch.lifecycle:viewmodel:1.1.0'\n    implementation 'com.google.android.gms:play-services:12.0.1'\n    implementation 'com.squareup.retrofit2:retrofit:2.5.0'\n    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'\n\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(date 1555122985000)
++++ app/build.gradle	(date 1555125594000)
+@@ -40,5 +40,4 @@
+     implementation 'com.google.android.gms:play-services:12.0.1'
+     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+-
+ }
+Index: app/src/main/java/com/example/picar/retrofit/UserLogin.java
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/UserLogin.java	(date 1555122985000)
++++ app/src/main/java/com/example/picar/retrofit/UserDataFormat/UserLogin.java	(date 1555340038000)
+@@ -1,13 +1,11 @@
+-package com.example.picar.retrofit;
++package com.example.picar.retrofit.UserDataFormat;
+ 
+ public class UserLogin {
+     private String email;
+     private String password;
+-    private boolean token;
+ 
+-    public UserLogin(String email,boolean token) {
++    public UserLogin(String email) {
+         this.email = email;
+-        this.token = token;
+     }
+ 
+     public UserLogin(String email,boolean token, String password) {
+@@ -23,7 +21,4 @@
+         return password;
+     }
+ 
+-    public boolean isToken() {
+-        return token;
+-    }
+ }
+Index: app/src/main/java/com/example/picar/retrofit/User.java
+===================================================================
+--- app/src/main/java/com/example/picar/retrofit/User.java	(date 1555122985000)
++++ app/src/main/java/com/example/picar/retrofit/UserDataFormat/User.java	(date 1555338003000)
+@@ -1,4 +1,4 @@
+-package com.example.picar.retrofit;
++package com.example.picar.retrofit.UserDataFormat;
+ 
+ 
+ import com.google.gson.annotations.SerializedName;
+@@ -16,7 +16,7 @@
+     private String current_position_id;
+     private String destination_id;
+     private String _id;
+-    private String token;
++    private String authorization;
+     public User(String email, String password, String family_name, String name, Number phone) {
+         this.email = email;
+         this.password = password;
+@@ -33,9 +33,6 @@
+         return destination_id;
+     }
+ 
+-    @SerializedName("body")
+-    private String text;
+-
+     public String getFamily_name() {
+         return family_name;
+     }
+@@ -60,7 +57,4 @@
+         return password;
+     }
+ 
+-    public String getText() {
+-        return text;
+-    }
+ }

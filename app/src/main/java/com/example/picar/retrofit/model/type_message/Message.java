@@ -1,4 +1,4 @@
-package com.example.picar.retrofit;
+package com.example.picar.retrofit.model.type_message;
 
 public class Message {
     private String message;

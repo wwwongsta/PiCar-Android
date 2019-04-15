@@ -35,7 +35,7 @@ import android.widget.TextView;
 
 import com.example.picar.R;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.User;
+import com.example.picar.retrofit.model.user_type.User;
 
 import java.util.ArrayList;
 import java.util.List;
