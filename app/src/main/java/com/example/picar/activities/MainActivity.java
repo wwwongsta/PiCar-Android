@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -20,8 +21,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.picar.R;
+import com.example.picar.database.AppDatabase;
+import com.example.picar.database.entity.User;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +39,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         checkLogIn();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -81,6 +84,38 @@ public class MainActivity extends AppCompatActivity
         }
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TextView test = findViewById(R.id.testUserInfo);
+        GetUserInfo task = new GetUserInfo(this,test);
+        task.execute((Void) null);
+    }
+    public class GetUserInfo extends AsyncTask<Void, Void, User> {
+
+        private final AppDatabase db;
+        private final TextView txt;
+        public GetUserInfo(Context c,TextView t) {
+            this.db = AppDatabase.getInstance(c);
+            this.txt = t;
+        }
+
+        @Override
+        protected User doInBackground(Void... params) {
+            User user = db.userDao().getListUser().get(0);
+            return user;
+        }
+
+        @Override
+        protected void onPostExecute(final User user) {
+            txt.setText(user.toString());
+        }
+        @Override
+        protected void onCancelled() {
+
+        }
     }
 
     public Address getCoordinatesOfAddress(Context context, String myLocation) throws IOException {

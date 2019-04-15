@@ -3,7 +3,7 @@ package com.example.picar.retrofit.model.position_type;
 public class Position {
 
     /**
-     * {
+     * {fsdf
      *   "_id": "5cb0bbc3dfd8360017f28389",
      *   "lat": 1,
      *   "lng": 48,

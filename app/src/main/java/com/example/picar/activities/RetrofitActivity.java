@@ -8,8 +8,8 @@ import com.example.picar.R;
 import com.example.picar.retrofit.http_request.User_http_request;
 import com.example.picar.retrofit.model.type_message.Message;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.model.position_type.Position;
-import com.example.picar.retrofit.model.user_type.User;
+import com.example.picar.database.entity.Position;
+import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.example.picar.retrofit.model.user_type.UserLogin;
 

@@ -32,6 +32,6 @@ public interface PositionDao {
     @Query("SELECT * from positions")
     List<Position> getListPosition();
 
-    @Query("SELECT * FROM positions WHERE id LIKE :id LIMIT 1")
-    Position get_Position_ByPositionid(int id);
+    @Query("SELECT * FROM positions WHERE _id LIKE :id LIMIT 1")
+    Position get_Position_ByPositionid(String id);
 }
