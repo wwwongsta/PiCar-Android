@@ -28,7 +28,7 @@ import com.example.picar.R;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.Position;
+import com.example.picar.database.entity.Position;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -64,10 +64,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
+    private String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
 
 //    private String GEOFENCE_REQ_ID = "myGeofence";
 //    private PendingIntent geofencePendingI;
-
     // The entry points to the Places API.
     //private GeoDataClient mGeoDataClient;
     //private PlaceDetectionClient mPlaceDetectionClient;
@@ -199,9 +199,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void updatePosition(String id, MarkerOptions marker) {
-        Position position = new Position(id, marker.getPosition().latitude, marker.getPosition().longitude,id);
+        Position position = new Position(marker.getPosition().latitude, marker.getPosition().longitude);
 
-        Call<Position> call = api.putPosition(id, position);
+        Call<Position> call = api.putPosition(token,id, position);
 
         call.enqueue(new Callback<Position>() {
             @Override

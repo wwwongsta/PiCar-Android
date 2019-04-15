@@ -4,59 +4,59 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 @Entity(tableName = "positions")
 public class Position {
     @PrimaryKey
-    @ColumnInfo(name = "id")
-    int id;
-    @ColumnInfo(name = "latitude")
-    int latitude;
-    @ColumnInfo(name = "longitude")
-    int longitude;
+    @NonNull
+    @ColumnInfo(name = "_id")
+    String _id;
+    @ColumnInfo(name = "lat")
+    double lat;
+    @ColumnInfo(name = "lng")
+    double lng;
     @ColumnInfo(name = "userId")
-    int userId;
+    String userId;
 
     public Position() {
     }
-@Ignore
-    public Position(int id, int latitude, int longitude, int userId) {
-        this.id = id;
-        this.latitude = latitude;
-        this.longitude = longitude;
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
+    }
+
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-
-    public int getId() {
-        return id;
+    public double getLat() {
+        return lat;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public double getLng() {
+        return lng;
     }
 
-    public int getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(int latitude) {
-        this.latitude = latitude;
-    }
-
-    public int getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(int longitude) {
-        this.longitude = longitude;
-    }
-
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
+    }
+
+    @Ignore
+    public Position(double lat, double lng) {
+        this.lat = lat;
+        this.lng = lng;
     }
 }
