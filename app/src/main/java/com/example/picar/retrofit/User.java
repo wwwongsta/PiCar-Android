@@ -8,6 +8,9 @@ public class User {
      *     "email":"secondTest@mail.com",
      *     "password":unaTest
      */
+
+
+
     private String email;
     private String password;
     private String family_name;

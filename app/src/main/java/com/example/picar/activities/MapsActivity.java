@@ -137,8 +137,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        Button btn_destination = (Button) findViewById(R.id.search_button_destination);
-        final EditText ed_destination = (EditText) findViewById(R.id.editText_destination);
+        Button btn_destination = findViewById(R.id.search_button_destination);
+        final EditText ed_destination = findViewById(R.id.editText_destination);
         btn_destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,7 +146,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(mCurrentAddress != null && mDestinationAddress != null){
                     mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
                     mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
-                    ArrayList<MarkerOptions> markers = new ArrayList<MarkerOptions>();
+                    ArrayList<MarkerOptions> markers = new ArrayList<>();
                     markers.add(mCurrentMarkerOptions);
                     markers.add(mDestinationMarkerOptions);
                     new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
@@ -178,8 +178,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        Button btn_location = (Button) findViewById(R.id.search_button_location);
-        final EditText ed_location = (EditText) findViewById(R.id.editText_location);
+        Button btn_location =  findViewById(R.id.search_button_location);
+        final EditText ed_location =  findViewById(R.id.editText_location);
         btn_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,6 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+
 
 
     @Override
