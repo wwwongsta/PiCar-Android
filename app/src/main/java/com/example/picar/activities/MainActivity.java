@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         GetUserInfo task = new GetUserInfo(this,test);
         task.execute((Void) null);
     }
+
     public class GetUserInfo extends AsyncTask<Void, Void, User> {
 
         private final AppDatabase db;
@@ -104,13 +105,18 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected User doInBackground(Void... params) {
-            User user = db.userDao().getListUser().get(0);
+            User user = null;
+            List<User> users = db.userDao().getListUser();
+            if (users.size() > 0)
+             user = users.get(0);
+
             return user;
         }
 
         @Override
         protected void onPostExecute(final User user) {
-            txt.setText(user.toString());
+            if (user != null)
+                txt.setText(user.toString());
         }
         @Override
         protected void onCancelled() {
