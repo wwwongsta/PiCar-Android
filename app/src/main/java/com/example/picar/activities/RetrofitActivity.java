@@ -1,13 +1,13 @@
 package com.example.picar.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.example.picar.R;
+import com.example.picar.database.AppDatabase;
+import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.Position;
-import com.example.picar.retrofit.User;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitActivity extends AppCompatActivity {
     TextView tx;
     private PiCarApi api;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,20 +32,22 @@ public class RetrofitActivity extends AppCompatActivity {
                 .build();
         api = retrofit.create(PiCarApi.class);
         getusers();
-      //  getAllPosition();
+        //getUser();
+        //  getAllPosition();
     }
-    private void getUser(){
+
+    private void getUser() {
         Call<User> call = api.getUser("secondTest@mail.com");
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if(!response.isSuccessful()){
-                    tx.setText("code : "+ response.code());
+                if (!response.isSuccessful()) {
+                    tx.setText("code : " + response.code());
                     return;
                 }
                 User user = response.body();
 
-                    tx.append(user.getPassword());
+                tx.append(user.getPassword());
 
 
             }
@@ -57,7 +60,8 @@ public class RetrofitActivity extends AppCompatActivity {
 
 
     }
-//    private void getAllPosition(){
+
+    //    private void getAllPosition(){
 //        Call<List<Position>> call = api.getAllPosition();
 //        call.enqueue(new Callback<List<Position>>() {
 //            @Override
@@ -82,20 +86,23 @@ public class RetrofitActivity extends AppCompatActivity {
 //            }
 //        });
 //    }
-    private void getusers(){
+    private void getusers() {
         Call<List<User>> call = api.getAllUser();
         call.enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                if(!response.isSuccessful()){
-                    tx.setText("code : "+ response.code());
+                if (!response.isSuccessful()) {
+                    tx.setText("code : " + response.code());
                     return;
                 }
+                AppDatabase.getInstance(getApplicationContext()).userDao().alldelete();
                 List<User> users = response.body();
-                for (User user:users){
+                AppDatabase.getInstance(getApplicationContext()).userDao().insert(users.get(0));
+                for (User user : users) {
+
                     String content = "";
                     content += "Email :" + user.getEmail() + "\n";
-                    content += "Password :"+ user.getPassword()+"\n";
+                    content += "Password :" + user.getPassword() + "\n";
                     tx.append(content);
                 }
             }
