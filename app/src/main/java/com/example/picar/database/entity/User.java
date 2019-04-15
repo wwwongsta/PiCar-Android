@@ -8,13 +8,12 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-
+import com.google.gson.annotations.SerializedName;
 @Entity(tableName = "users")
 public class User {
 
     public User() {
     }
-
 
     @Ignore
     public User(int id, int payement_id, String name, String family_name,
@@ -70,7 +69,7 @@ public class User {
     private String user_photo;
 
 
-
+    @SerializedName("body")
     public int getId() {
         return id;
     }

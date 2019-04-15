@@ -3,7 +3,7 @@ package com.example.picar.retrofit;
 
 import com.google.gson.annotations.SerializedName;
 
-public class User {
+public class Usere {
     /**
      *     "email":"secondTest@mail.com",
      *     "password":unaTest

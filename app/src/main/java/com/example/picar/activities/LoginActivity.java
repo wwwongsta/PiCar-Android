@@ -32,12 +32,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
-import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.User;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -229,39 +225,39 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-         PiCarApi api;
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://cryptic-stream-69346.herokuapp.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        api = retrofit.create(PiCarApi.class);
-        Call<List<User>> call = api.getAllUser();
-        call.enqueue(new Callback<List<User>>() {
-            @Override
-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                if(!response.isSuccessful()){
-                    afficheApi.setText("code : "+ response.code());
-                    Log.i("RETROFIT","code : "+ response.code());
-                    return;
-                }
-                List<User> users = response.body();
-                for (User user:users){
-                    String content = "";
-                    content += "Email :" + user.getEmail() + "\n";
-                    content += "Password :"+ user.getPassword()+"\n";
-                    afficheApi.append(content);
-                    Log.i("RETROFIT",content);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
-                afficheApi.setText(t.getMessage());
-                Log.i("RETROFIT",t.getMessage());
-            }
-        });
-
-        Log.i("RETROFIT","Message Test");
+//         PiCarApi api;
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl("https://cryptic-stream-69346.herokuapp.com/")
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//        api = retrofit.create(PiCarApi.class);
+//        Call<List<User>> call = api.getAllUser();
+//        call.enqueue(new Callback<List<User>>() {
+//            @Override
+//            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+//                if(!response.isSuccessful()){
+//                    afficheApi.setText("code : "+ response.code());
+//                    Log.i("RETROFIT","code : "+ response.code());
+//                    return;
+//                }
+//                List<User> users = response.body();
+//                for (User user:users){
+//                    String content = "";
+//                    content += "Email :" + user.getEmail() + "\n";
+//                    content += "Password :"+ user.getPassword()+"\n";
+//                    afficheApi.append(content);
+//                    Log.i("RETROFIT",content);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<User>> call, Throwable t) {
+//                afficheApi.setText(t.getMessage());
+//                Log.i("RETROFIT",t.getMessage());
+//            }
+//        });
+//
+//        Log.i("RETROFIT","Message Test");
 
 
 
