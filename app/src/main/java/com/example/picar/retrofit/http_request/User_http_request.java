@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.model.type_message.Message;
-import com.example.picar.retrofit.model.user_type.User;
+import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.example.picar.retrofit.model.user_type.UserLogin;
 

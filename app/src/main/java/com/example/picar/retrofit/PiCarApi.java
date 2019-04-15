@@ -1,8 +1,8 @@
 package com.example.picar.retrofit;
 
-import com.example.picar.retrofit.model.position_type.Position;
+import com.example.picar.database.entity.Position;
 import com.example.picar.retrofit.model.type_message.Message;
-import com.example.picar.retrofit.model.user_type.User;
+import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.example.picar.retrofit.model.user_type.UserLogin;
 

@@ -26,7 +26,7 @@ import com.example.picar.R;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.model.position_type.Position;
+import com.example.picar.database.entity.Position;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -59,7 +59,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
-
+    private String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
     // The entry points to the Places API.
     //private GeoDataClient mGeoDataClient;
     //private PlaceDetectionClient mPlaceDetectionClient;
@@ -128,8 +128,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        Button btn_destination = (Button) findViewById(R.id.search_button_destination);
-        final EditText ed_destination = (EditText) findViewById(R.id.editText_destination);
+        Button btn_destination = findViewById(R.id.search_button_destination);
+        final EditText ed_destination = findViewById(R.id.editText_destination);
         btn_destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,7 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(mCurrentAddress != null && mDestinationAddress != null){
                     mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
                     mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
-                    ArrayList<MarkerOptions> markers = new ArrayList<MarkerOptions>();
+                    ArrayList<MarkerOptions> markers = new ArrayList<>();
                     markers.add(mCurrentMarkerOptions);
                     markers.add(mDestinationMarkerOptions);
                     new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
@@ -169,8 +169,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        Button btn_location = (Button) findViewById(R.id.search_button_location);
-        final EditText ed_location = (EditText) findViewById(R.id.editText_location);
+        Button btn_location =  findViewById(R.id.search_button_location);
+        final EditText ed_location =  findViewById(R.id.editText_location);
         btn_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,9 +180,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void updatePosition(String id, MarkerOptions marker) {
-        Position position = new Position(id, marker.getPosition().latitude, marker.getPosition().longitude,id);
+        Position position = new Position(marker.getPosition().latitude, marker.getPosition().longitude);
 
-        Call<Position> call = api.putPosition(id, position);
+        Call<Position> call = api.putPosition(token,id, position);
 
         call.enqueue(new Callback<Position>() {
             @Override
@@ -217,6 +217,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+
 
 
     @Override
@@ -406,6 +407,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + getString(R.string.google_maps_key);
         return url;
+
     }
 
 
