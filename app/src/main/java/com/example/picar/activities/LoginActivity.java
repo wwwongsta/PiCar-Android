@@ -32,7 +32,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
 import com.example.picar.database.entity.User;
@@ -40,7 +39,6 @@ import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.http_request.User_http_request;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.example.picar.retrofit.model.user_type.UserLogin;
-
 import java.util.ArrayList;
 import java.util.List;
 
