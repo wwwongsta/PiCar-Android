@@ -2,8 +2,10 @@ package com.example.picar.activities;
 
 
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -26,8 +28,11 @@ import com.example.picar.R;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.database.entity.Position;
+import com.example.picar.retrofit.Position;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -59,7 +64,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
-    private String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
+
+//    private String GEOFENCE_REQ_ID = "myGeofence";
+//    private PendingIntent geofencePendingI;
+
     // The entry points to the Places API.
     //private GeoDataClient mGeoDataClient;
     //private PlaceDetectionClient mPlaceDetectionClient;
@@ -174,15 +182,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setCurrentLocation(ed_location);
+                if(ed_destination!=null){
+                    setCurrentLocation(ed_location);
+                }
+            }
+        });
+
+        Button btn_rides = findViewById(R.id.search_button_ride);
+        btn_rides.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MapsActivity.this,CardViewActivity.class);
+                startActivity(i);
             }
         });
     }
 
     private void updatePosition(String id, MarkerOptions marker) {
-        Position position = new Position(marker.getPosition().latitude, marker.getPosition().longitude);
+        Position position = new Position(id, marker.getPosition().latitude, marker.getPosition().longitude,id);
 
-        Call<Position> call = api.putPosition(token,id, position);
+        Call<Position> call = api.putPosition(id, position);
 
         call.enqueue(new Callback<Position>() {
             @Override
@@ -360,6 +379,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+//    private Geofence getGeofence() {
+//        //geofence around user
+//        return new Geofence.Builder()
+//                .setRequestId(GEOFENCE_REQ_ID)
+//                // geofence position and his range in meters.
+//                .setCircularRegion(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 2000.0f)
+//                // idk what this is.
+//                .setExpirationDuration(60 * 60 * 1000)
+//                // for detecting when something enter de geofence
+//                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL)
+//                .build();
+//    }
+//
+//    private GeofencingRequest getGeofencingRequest() {
+//        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+//        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+//        builder.addGeofence(getGeofence());
+//        return builder.build();
+//    }
+//
+//
+//    private PendingIntent createGeofencePendingI() {
+//        if (geofencePendingI != null)
+//            return geofencePendingI;
+//
+//        Intent i = new Intent(this, GeofenceService.class);
+//        geofencePendingI = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+//        return geofencePendingI;
+//
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

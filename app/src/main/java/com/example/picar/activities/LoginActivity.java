@@ -32,15 +32,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
-import com.example.picar.database.entity.User;
-import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.http_request.User_http_request;
-import com.example.picar.retrofit.model.user_type.UserInfo;
-import com.example.picar.retrofit.model.user_type.UserLogin;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,9 +48,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>
-        , User_http_request.UserHttpError
-        , User_http_request.UserHttpResponse {
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -368,44 +359,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int IS_PRIMARY = 1;
     }
 
-    @Override
-    public void login(Call<UserInfo> call, Response<UserInfo> response){
-        UserInfo userInfo = response.body();
-        AddUserInfoToDatabase addUser = new AddUserInfoToDatabase(userInfo, this);
-        addUser.execute((Void) null);
-        mAuthTask = null;
-        finish();
-    }
-
-    @Override
-    public void errorLogin(Call<UserInfo> call, Throwable t) {
-        mAuthTask = null;
-        mPasswordView.setError(getString(R.string.error_incorrect_password));
-        mPasswordView.requestFocus();
-    }
-    public class AddUserInfoToDatabase extends AsyncTask<Void, Void, Boolean> {
-        public AddUserInfoToDatabase(UserInfo userInfo,Context c) {
-            this.userInfo = userInfo;
-            this.db = AppDatabase.getInstance(c);
-        }
-        private AppDatabase db;
-        private UserInfo userInfo;
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            db.userDao().alldelete();
-            db.userDao().insert(userInfo.getUser_info());
-            showProgress(false);
-
-            return null;
-        }
-    }
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-
-
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
@@ -418,9 +375,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            User_http_request request = new User_http_request(LoginActivity.this);
-            UserLogin user = new UserLogin(mEmail,mPassword);
-            request.login(user);
+            // TODO: attempt authentication against a network service.
+            try {
+                // Simulate network access.
+//                AppDatabase.getInstance(LoginActivity.this);
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                return false;
+            }
+
+            for (String credential : DUMMY_CREDENTIALS) {
+                String[] pieces = credential.split(":");
+                if (pieces[0].equals(mEmail)) {
+                    // Account exists, return true if the password matches.
+                    return pieces[1].equals(mPassword);
+                }
+            }
+
+            // TODO: register the new account here.
+
             return true;
         }
 
