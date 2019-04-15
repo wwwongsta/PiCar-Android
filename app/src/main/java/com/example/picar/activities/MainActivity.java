@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.picar.activities.SettingsActivity.KEY_PREF_AUTHORIZATION;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 

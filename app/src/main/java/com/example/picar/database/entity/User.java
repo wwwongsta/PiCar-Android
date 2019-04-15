@@ -38,6 +38,7 @@ public class User {
 
 
     @PrimaryKey
+    @SerializedName("_id")
     @ColumnInfo(name = "user_id")
     private int id;
 
@@ -69,7 +70,7 @@ public class User {
     private String user_photo;
 
 
-    @SerializedName("body")
+
     public int getId() {
         return id;
     }
