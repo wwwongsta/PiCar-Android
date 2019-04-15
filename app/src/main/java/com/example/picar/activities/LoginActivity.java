@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.picar.R;
+import com.example.picar.database.AppDatabase;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.User;
 
@@ -381,6 +382,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // TODO: attempt authentication against a network service.
             try {
                 // Simulate network access.
+//                AppDatabase.getInstance(LoginActivity.this);
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 return false;
@@ -395,6 +397,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
 
             // TODO: register the new account here.
+
             return true;
         }
 

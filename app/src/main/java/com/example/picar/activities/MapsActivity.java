@@ -2,8 +2,10 @@ package com.example.picar.activities;
 
 
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -31,6 +33,9 @@ import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.Position;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.PlaceDetectionClient;
@@ -68,6 +73,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
+
+//    private String GEOFENCE_REQ_ID = "myGeofence";
+//    private PendingIntent geofencePendingI;
 
     // The entry points to the Places API.
     //private GeoDataClient mGeoDataClient;
@@ -369,6 +377,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+//    private Geofence getGeofence() {
+//        //geofence around user
+//        return new Geofence.Builder()
+//                .setRequestId(GEOFENCE_REQ_ID)
+//                // geofence position and his range in meters.
+//                .setCircularRegion(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 2000.0f)
+//                // idk what this is.
+//                .setExpirationDuration(60 * 60 * 1000)
+//                // for detecting when something enter de geofence
+//                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL)
+//                .build();
+//    }
+//
+//    private GeofencingRequest getGeofencingRequest() {
+//        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+//        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+//        builder.addGeofence(getGeofence());
+//        return builder.build();
+//    }
+//
+//
+//    private PendingIntent createGeofencePendingI() {
+//        if (geofencePendingI != null)
+//            return geofencePendingI;
+//
+//        Intent i = new Intent(this, GeofenceService.class);
+//        geofencePendingI = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+//        return geofencePendingI;
+//
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
