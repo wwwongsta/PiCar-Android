@@ -188,10 +188,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     updatePosition(currentLocationId, mCurrentMarkerOptions);
                     updatePosition(destinationId, mDestinationMarkerOptions);
-                    btn_destination.setVisibility(View.GONE);
-                    ed_destination.setVisibility(View.GONE);
-                    btn_location.setVisibility(View.GONE);
-                    ed_location.setVisibility(View.GONE);
+                    if(TYPE.equals("Driver")) {
+                        btn_destination.setVisibility(View.GONE);
+                        ed_destination.setVisibility(View.GONE);
+                        btn_location.setVisibility(View.GONE);
+                        ed_location.setVisibility(View.GONE);
+                    }
                 }
             }
         });
