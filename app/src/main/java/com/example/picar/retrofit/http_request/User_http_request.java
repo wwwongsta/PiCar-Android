@@ -48,6 +48,7 @@ public class User_http_request {
         default void errorLogin(Call<UserInfo> call, Throwable t){
 
         }
+
     }
     public interface UserHttpResponse{
         default void createUser(Call<Message> call, Response<Message> response){

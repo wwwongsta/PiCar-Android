@@ -33,7 +33,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
+            <Button
+                android:id="@+id/register_button"
+                style="?android:textAppearanceSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               android:layout_gravity="right"
+                android:text="Register"
+                android:onClick="startRegisterActivite"/>
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -81,6 +88,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Keep me logged in" />
+
+
 
             <TextView
                 android:id="@+id/content"
