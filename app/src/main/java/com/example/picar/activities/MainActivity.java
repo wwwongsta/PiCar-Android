@@ -68,12 +68,24 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Button driverButton = (Button) findViewById(R.id.button_driver);
+        driverButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent driver = new Intent(MainActivity.this, MapsActivity.class);
+                driver.putExtra("type", "Driver");
+                startActivity(driver);
+
+            }
+        });
 
         Button passengerButton = (Button) findViewById(R.id.button_passenger);
         passengerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class));
+                Intent passager = new Intent(MainActivity.this, MapsActivity.class);
+                passager.putExtra("type", "Passager");
+                startActivity(passager);
             }
         });
 
