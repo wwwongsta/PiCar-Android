@@ -89,6 +89,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:text="@string/title_register"
+                android:onClick="startRegisterActivite"
                 android:textColor="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color" />
 
             <TextView
