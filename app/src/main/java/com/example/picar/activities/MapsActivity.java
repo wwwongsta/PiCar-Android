@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 
 import com.example.picar.R;
+import com.example.picar.database.AppDatabase;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
@@ -178,12 +179,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     mMap.animateCamera(cu);
 
-//                    String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
-//                    String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
+                   String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
+                   String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
 
-                    //pour test car on a pas de user encore
-                    String currentLocationId = "5cb0f5ac5781820017b60bab";
-                    String destinationId = "5cb0f5ac5781820017b60baa";
+//                    //pour test car on a pas de user encore
+//                    String currentLocationId = "5cb0f5ac5781820017b60bab";
+//                    String destinationId = "5cb0f5ac5781820017b60baa";
 
                     updatePosition(currentLocationId, mCurrentMarkerOptions);
                     updatePosition(destinationId, mDestinationMarkerOptions);
