@@ -26,7 +26,6 @@ public class User {
     @ColumnInfo(name = "_id")
     private String _id;
 
-
     @ColumnInfo(name = "current_position_id")
     private String current_position_id;
 

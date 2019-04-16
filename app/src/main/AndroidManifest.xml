@@ -43,6 +43,12 @@
             android:name=".activities.CardViewActivity"
             android:label="@string/title_activity_card_view" />
         <activity
+            android:name=".activities.RegisterActivity"
+            android:label="@string/title_register" />
+        <activity
+            android:name=".activities.CardViewActivity"
+            android:label="@string/title_activity_card_view" />
+        <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
@@ -67,6 +73,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.HelpActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".activities.AboutActivity"
             android:exported="true">
         </activity>
     </application>
