@@ -102,9 +102,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private PiCarApi api;
 
+    private String TYPE;
+
+    Button btn_rides;
+    Button btn_location;
+    Button btn_destination;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        if(intent.hasExtra("type")){
+            TYPE = intent.getStringExtra("type");
+        }
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -136,8 +146,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        Button btn_destination = findViewById(R.id.search_button_destination);
+        btn_location =  findViewById(R.id.search_button_location);
+        btn_destination = findViewById(R.id.search_button_destination);
+        btn_rides = findViewById(R.id.search_button_ride);
+
         final EditText ed_destination = findViewById(R.id.editText_destination);
+        final EditText ed_location =  findViewById(R.id.editText_location);
+
         btn_destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,13 +187,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     updatePosition(currentLocationId, mCurrentMarkerOptions);
                     updatePosition(destinationId, mDestinationMarkerOptions);
-
+                    btn_destination.setVisibility(View.GONE);
+                    ed_destination.setVisibility(View.GONE);
+                    btn_location.setVisibility(View.GONE);
+                    ed_location.setVisibility(View.GONE);
                 }
             }
         });
 
-        Button btn_location =  findViewById(R.id.search_button_location);
-        final EditText ed_location =  findViewById(R.id.editText_location);
         btn_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,7 +204,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        Button btn_rides = findViewById(R.id.search_button_ride);
         btn_rides.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,6 +211,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(i);
             }
         });
+
+        if(TYPE.equals("Driver")){
+            btn_rides.setEnabled(false);
+            btn_rides.setVisibility(View.GONE);
+        }
     }
 
     private void updatePosition(String id, MarkerOptions marker) {
