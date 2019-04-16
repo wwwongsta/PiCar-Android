@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.support.annotation.NonNull;
@@ -30,6 +31,8 @@ import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.database.entity.Position;
+import com.example.picar.retrofit.http_request.User_http_request;
+import com.example.picar.retrofit.model.user_type.UserLogin;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -61,12 +64,13 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError
+        , User_http_request.UserHttpResponse {
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
     private String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
-
+    private PutPositionTask mAuthTask = null;
 //    private String GEOFENCE_REQ_ID = "myGeofence";
 //    private PendingIntent geofencePendingI;
     // The entry points to the Places API.
@@ -92,6 +96,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private MarkerOptions mCurrentMarkerOptions;
     private MarkerOptions mDestinationMarkerOptions;
+
+
 
     private Polyline currentPolyline;
 
@@ -179,19 +185,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     mMap.animateCamera(cu);
 
+
+
                    String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
                    String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
+//
+//
+                    mAuthTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
+                    mAuthTask.execute((Void) null);
+                    mAuthTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
+                    mAuthTask.execute((Void) null);
 
 //                    //pour test car on a pas de user encore
 //                    String currentLocationId = "5cb0f5ac5781820017b60bab";
 //                    String destinationId = "5cb0f5ac5781820017b60baa";
 
-                    updatePosition(currentLocationId, mCurrentMarkerOptions);
-                    updatePosition(destinationId, mDestinationMarkerOptions);
-                    btn_destination.setVisibility(View.GONE);
-                    ed_destination.setVisibility(View.GONE);
-                    btn_location.setVisibility(View.GONE);
-                    ed_location.setVisibility(View.GONE);
+
+//
+//                    updatePosition(currentLocationId, mCurrentMarkerOptions);
+//                    updatePosition(destinationId, mDestinationMarkerOptions);
+//                    btn_destination.setVisibility(View.GONE);
+//                    ed_destination.setVisibility(View.GONE);
+//                    btn_location.setVisibility(View.GONE);
+//                    ed_location.setVisibility(View.GONE);
                 }
             }
         });
@@ -480,6 +496,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return url;
 
     }
+
+
+    public class PutPositionTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        private final String mId;
+//        private final String mPosition;
+        private final MarkerOptions mMarkerOptions;
+
+        PutPositionTask(String id, MarkerOptions markerOptions) {
+            mId = id;
+            mMarkerOptions = markerOptions;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            Position position = new Position(mMarkerOptions.getPosition().latitude, mMarkerOptions.getPosition().longitude);
+
+            request.PutPosition(token, mId, position);
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mAuthTask = null;
+            //showProgress(false);
+
+            if (success) {
+               // finish();
+            } else {
+                //mPasswordView.setError(getString(R.string.error_incorrect_password));
+               // mPasswordView.requestFocus();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            //showProgress(false);
+        }
+
+
+    }
+
+
 
 
 }

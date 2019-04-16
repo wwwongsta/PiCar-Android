@@ -103,9 +103,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        TextView test = findViewById(R.id.testUserInfo);
-        GetUserInfo task = new GetUserInfo(this,test);
-        task.execute((Void) null);
+//        TextView test = findViewById(R.id.testUserInfo);
+//        GetUserInfo task = new GetUserInfo(this,test);
+//        task.execute((Void) null);
     }
 
     public class GetUserInfo extends AsyncTask<Void, Void, User> {

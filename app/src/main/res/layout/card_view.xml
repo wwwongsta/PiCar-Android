@@ -67,19 +67,20 @@
 
         </LinearLayout>
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/viewMap"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".activities.CardViewActivity" />
+            android:layout_height="wrap_content" />
+
+
 
         <Button
             android:id="@+id/Accept"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/select_driver" />
+            android:text="" />
     </LinearLayout>
 
 </android.support.v7.widget.CardView>
