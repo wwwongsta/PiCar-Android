@@ -31,15 +31,13 @@ public abstract class SingleCardFragment extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.card_view_activity);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.viewMap);
-        mapFragment.getMapAsync((OnMapReadyCallback) this);
+
         FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.fragmet_container);
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
 
         if(fragment == null){
             fragment = createFragment();
-            fm.beginTransaction().add(R.id.fragmet_container, fragment).commit();
+            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
     }
 }
