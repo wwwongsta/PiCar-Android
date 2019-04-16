@@ -69,7 +69,7 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
         Email = email.getText().toString();
         Password = password.getText().toString();
         FamilyName = family_name.getText().toString();
-7
+
         String validName = "[A-Z][a-zA-Z]*";
         String validPhone = "^[+]?[0-9]{10,13}$";
         String validEmail = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
