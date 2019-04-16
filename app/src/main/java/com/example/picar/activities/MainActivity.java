@@ -194,7 +194,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_payment) {
 
         } else if (id == R.id.nav_about) {
-
+            startActivity(new Intent(MainActivity.this, AboutActivity.class));
+            return true;
         } else if (id == R.id.nav_settings){
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             return true;
