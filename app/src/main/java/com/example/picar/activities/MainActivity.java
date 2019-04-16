@@ -21,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.picar.R;
@@ -56,6 +55,14 @@ public class MainActivity extends AppCompatActivity
          */
 //        Intent i = new Intent(this,RetrofitActivity.class);
 //        startActivity(i);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -66,7 +73,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ImageButton driverButton = (ImageButton) findViewById(R.id.button_driver);
+        Button driverButton = (Button) findViewById(R.id.button_driver);
         driverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,7 +84,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        ImageButton passengerButton = (ImageButton) findViewById(R.id.button_passenger);
+        Button passengerButton = (Button) findViewById(R.id.button_passenger);
         passengerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,9 +108,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-//        TextView test = findViewById(R.id.testUserInfo);
-//        GetUserInfo task = new GetUserInfo(this,test);
-//        task.execute((Void) null);
+        TextView test = findViewById(R.id.testUserInfo);
+        GetUserInfo task = new GetUserInfo(this,test);
+        task.execute((Void) null);
     }
 
     public class GetUserInfo extends AsyncTask<Void, Void, User> {

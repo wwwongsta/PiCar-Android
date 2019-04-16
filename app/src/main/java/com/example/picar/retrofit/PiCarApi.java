@@ -41,9 +41,6 @@ public interface PiCarApi {
     Call<Position> putPosition(@Header("authorization") String token,@Path("id") String id, @Body Position position);
 
     @PUT("position/{id}")
-    Call<Position> putPosition(@Path("id") String id, @Body Position position);
-
-    @PUT("position/{id}")
     Call<Position> getPosition(@Header("authorization") String token,@Path("id") String id, @Body Position position);
 
 }
