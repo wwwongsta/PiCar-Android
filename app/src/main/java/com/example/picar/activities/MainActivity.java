@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.picar.activities.SettingsActivity.KEY_PREF_AUTHORIZATION;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -66,12 +68,24 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Button driverButton = (Button) findViewById(R.id.button_driver);
+        driverButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent driver = new Intent(MainActivity.this, MapsActivity.class);
+                driver.putExtra("type", "Driver");
+                startActivity(driver);
+
+            }
+        });
 
         Button passengerButton = (Button) findViewById(R.id.button_passenger);
         passengerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, MapsActivity.class));
+                Intent passager = new Intent(MainActivity.this, MapsActivity.class);
+                passager.putExtra("type", "Passager");
+                startActivity(passager);
             }
         });
 
@@ -93,6 +107,7 @@ public class MainActivity extends AppCompatActivity
         GetUserInfo task = new GetUserInfo(this,test);
         task.execute((Void) null);
     }
+
     public class GetUserInfo extends AsyncTask<Void, Void, User> {
 
         private final AppDatabase db;
@@ -104,13 +119,18 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected User doInBackground(Void... params) {
-            User user = db.userDao().getListUser().get(0);
+            User user = null;
+            List<User> users = db.userDao().getListUser();
+            if (users.size() > 0)
+             user = users.get(0);
+
             return user;
         }
 
         @Override
         protected void onPostExecute(final User user) {
-            txt.setText(user.toString());
+            if (user != null)
+                txt.setText(user.toString());
         }
         @Override
         protected void onCancelled() {
@@ -186,7 +206,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_payment) {
 
         } else if (id == R.id.nav_about) {
-
+            startActivity(new Intent(MainActivity.this, AboutActivity.class));
+            return true;
         } else if (id == R.id.nav_settings){
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             return true;

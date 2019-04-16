@@ -11,6 +11,7 @@ import android.view.View;
 import com.example.picar.SettingsFragment;
 
 public class SettingsActivity extends AppCompatActivity {
+    public static final String KEY_PREF_AUTHORIZATION = "authorization_key";
     public static final String KEY_PREF_STAY_LOGGED_IN = "preference_stay_logged_in";
     public static final String KEY_PREF_STAY_SERVER_ADDRESS = "preference_server_address";
     public static final String KEY_PREF_STAY_WEB_APP = "preference_web_app";
@@ -31,3 +32,12 @@ public class SettingsActivity extends AppCompatActivity {
                 .commit();
     }
 }
+/*Example comment Ecrire dans la clé d'authorization
+/* public void authorization(){
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet(KEY_PREF_AUTHORIZATION, "as");
+        editor.apply();
+
+    }*/

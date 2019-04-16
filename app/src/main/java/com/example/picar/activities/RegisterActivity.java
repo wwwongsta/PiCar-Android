@@ -1,5 +1,7 @@
 package com.example.picar.activities;
 
+import android.app.LoaderManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.PasswordTransformationMethod;
@@ -10,9 +12,17 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.picar.R;
+import com.example.picar.database.entity.User;
+import com.example.picar.retrofit.http_request.User_http_request;
+import com.example.picar.retrofit.model.type_message.Message;
+import com.example.picar.retrofit.model.user_type.UserInfo;
 
-public class RegisterActivity extends AppCompatActivity {
-    EditText name,phone,email,password;
+import retrofit2.Call;
+import retrofit2.Response;
+
+public class RegisterActivity extends AppCompatActivity implements User_http_request.UserHttpError
+        , User_http_request.UserHttpResponse {
+    EditText name,phone,email,password,family_name;
     Button signIn;
     CheckBox visiblePassword;
 
@@ -24,6 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
         phone = (EditText) findViewById(R.id.Phone);
         email = (EditText) findViewById(R.id.Email);
         password = (EditText) findViewById(R.id.Password);
+        family_name = findViewById(R.id.FamilyName);
 
         visiblePassword = (CheckBox)findViewById(R.id.visiblePassword);
         visiblePassword.setOnClickListener(new View.OnClickListener() {
@@ -49,13 +60,15 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+
     private boolean confirmValues() {
         boolean result = true;
-        String Name, Phone, Email, Password;
+        String Name, Phone, Email, Password,FamilyName;
         Name = name.getText().toString();
         Phone = phone.getText().toString();
         Email = email.getText().toString();
         Password = password.getText().toString();
+        FamilyName = family_name.getText().toString();
 
         String validName = "[A-Z][a-zA-Z]*";
         String validPhone = "^[+]?[0-9]{10,13}$";

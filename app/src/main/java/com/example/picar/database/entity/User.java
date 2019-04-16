@@ -20,6 +20,7 @@ public class User {
         this.name = name;
         this.phone = phone;
     }
+    
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "_id")

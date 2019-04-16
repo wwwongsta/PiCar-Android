@@ -3,11 +3,13 @@ package com.example.picar.retrofit.http_request;
 import android.app.Activity;
 import android.util.Log;
 
+import com.example.picar.database.entity.Position;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.model.type_message.Message;
 import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.example.picar.retrofit.model.user_type.UserLogin;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,6 +50,12 @@ public class User_http_request {
         default void errorLogin(Call<UserInfo> call, Throwable t){
 
         }
+
+
+        default void errorGetPosition(Call<Position> call, Throwable t){
+
+        }
+
     }
     public interface UserHttpResponse{
         default void createUser(Call<Message> call, Response<Message> response){
@@ -62,6 +70,10 @@ public class User_http_request {
         }
 
         default void login(Call<UserInfo> call, Response<UserInfo> response){
+
+        }
+
+        default  void getPosition(Call<Position> call, Response<Position> response){
 
         }
     }
@@ -118,6 +130,22 @@ public class User_http_request {
             public void onFailure(Call<UserInfo> call, Throwable t) {
                 errorHandler.errorLogin(call,t);
             }
+        });
+    }
+
+    public void getPosition(String token, String id, Position position){
+        Call<Position> call = api.getPosition(token, id, position);
+        call.enqueue(new Callback<Position>() {
+            @Override
+            public void onResponse(Call<Position> call, Response<Position> response) {
+                responseHandler.getPosition(call, response);
+            }
+
+            @Override
+            public void onFailure(Call<Position> call, Throwable t) {
+                errorHandler.errorGetPosition(call, t);
+            }
+
         });
     }
 }

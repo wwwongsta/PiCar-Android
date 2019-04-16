@@ -33,5 +33,10 @@
         android:key="preference_stay_logged_in"
         android:title="Keep me logged in"
         android:summary="Turn this option on or off"/>
+    <Preference
+        android:key="authorization_key"
+        android:title="autorization"
+        android:summary="authorization is ..... "
+        />
 
 </PreferenceScreen>
