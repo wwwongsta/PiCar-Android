@@ -29,7 +29,7 @@ import com.example.picar.database.AppDatabase;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.database.entity.Position;
+import com.example.picar.retrofit.Position;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -201,7 +201,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 if(ed_destination!=null){
                     setCurrentLocation(ed_location);
-                }
+                }            }
+        });
+
+        Button btn_rides = findViewById(R.id.search_button_ride);
+        btn_rides.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MapsActivity.this,CardViewActivity.class);
+                startActivity(i);
+
             }
         });
 
@@ -220,9 +229,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void updatePosition(String id, MarkerOptions marker) {
-        Position position = new Position(marker.getPosition().latitude, marker.getPosition().longitude);
+        Position position = new Position(id, marker.getPosition().latitude, marker.getPosition().longitude,id);
 
-        Call<Position> call = api.putPosition(token,id, position);
+        Call<Position> call = api.putPosition(id, position);
 
         call.enqueue(new Callback<Position>() {
             @Override
