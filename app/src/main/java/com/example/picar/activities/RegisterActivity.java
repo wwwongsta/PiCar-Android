@@ -44,6 +44,9 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
 
 
 
+
+
+
         visiblePassword = (CheckBox)findViewById(R.id.visiblePassword);
         visiblePassword.setOnClickListener(new View.OnClickListener() {
             @Override
