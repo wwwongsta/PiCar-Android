@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="100dp"
     android:id="@+id/card_container"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="16dp"
@@ -63,21 +63,14 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
             </LinearLayout>
 
-
-
         </LinearLayout>
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/viewMap"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapView"
             android:layout_width="match_parent"
-
-            android:layout_height="match_parent"
-            tools:context=".activities.CardViewActivity" />
-
-            android:layout_height="300dp" />
-
+            android:layout_height="wrap_content" />
 
 
 
@@ -85,11 +78,7 @@
             android:id="@+id/Accept"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:text="@string/select_driver" />
-
-            android:text="Select ride" />
-
+            android:text="" />
     </LinearLayout>
 
 </android.support.v7.widget.CardView>
