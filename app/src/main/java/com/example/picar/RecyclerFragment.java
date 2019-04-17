@@ -19,6 +19,11 @@ import com.example.picar.activities.CardViewActivity;
 import com.example.picar.activities.MainActivity;
 import com.google.android.gms.maps.MapView;
 
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,19 +39,33 @@ public class RecyclerFragment extends Fragment {
         List<String> list = new ArrayList<>();
         list.add("one");
         list.add("two");
+
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new RecyclerViewAdapter(list));
         return view;
     }
+
     private class RecyclerViewHolder extends RecyclerView.ViewHolder {
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+    }
+
+    private class RecyclerViewHolder extends RecyclerView.ViewHolder implements OnMapReadyCallback{
+
         private CardView mCardView;
         private TextView mTextView_name,mTextView_car,mTextView_rating,mTextView_wait_time;
         private MapView mMapView;
         public Button select;
+
         public RecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
         }
+
         public RecyclerViewHolder(LayoutInflater inflater, ViewGroup container){
             super(inflater.inflate(R.layout.card_view ,container, false));
             mCardView = itemView.findViewById(R.id.card_container);
@@ -54,6 +73,16 @@ public class RecyclerFragment extends Fragment {
             mTextView_car = itemView.findViewById(R.id.text_car);
             mTextView_rating = itemView.findViewById(R.id.text_rating);
             mTextView_wait_time = itemView.findViewById(R.id.text_waiting_time);
+
+            mMapView = itemView.findViewById(R.id.mapView);
+
+
+            if(mMapView != null){
+                mMapView.onCreate(null);
+                mMapView.onResume();
+                mMapView.getMapAsync(this);
+            }
+
 
             select = itemView.findViewById(R.id.Accept);
             select.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +93,14 @@ public class RecyclerFragment extends Fragment {
 //                    startActivity(i);
                 }
             });
+        }
+
+        @Override
+        public void onMapReady(GoogleMap googleMap) {
+            MapsInitializer.initialize(getContext());
+            mMap = googleMap;
+            mMap.setMyLocationEnabled(true);
+            //setMapLocation();
         }
     }
 

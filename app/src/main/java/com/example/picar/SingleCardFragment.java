@@ -32,6 +32,7 @@ public abstract class SingleCardFragment extends AppCompatActivity {
         setContentView(R.layout.card_view_activity);
 
 
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.viewMap);
         mapFragment.getMapAsync((OnMapReadyCallback) this);
