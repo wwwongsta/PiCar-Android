@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.picar.activities.CardViewActivity;
 import com.example.picar.activities.MainActivity;
+import com.example.picar.activities.RideStatusActivity;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 
@@ -51,7 +52,7 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
 
 
         mMapView = (MapView) view.findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
+        //mMapView.onCreate(savedInstanceState);
 
         // mMap = mMapView.getMapAsync();
 
@@ -94,8 +95,8 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
                 @Override
                 public void onClick(View v) {
                     //SendNotification to driver
-//                    Intent i = new Intent(getActivity(),MainActivity.class);
-//                    startActivity(i);
+                    Intent i = new Intent(getActivity(), RideStatusActivity.class);
+                    startActivity(i);
                 }
             });
         }

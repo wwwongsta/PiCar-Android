@@ -76,6 +76,9 @@ public class User_http_request {
         default  void getPosition(Call<Position> call, Response<Position> response){
 
         }
+        default void rideStatus(Call<Message> call, Response<Message> response){
+
+        }
     }
     public void createUser(User user){
         Call<Message> call = api.createUser(user);

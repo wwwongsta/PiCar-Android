@@ -60,6 +60,9 @@
                 android:value=".activities.MainActivity" />
         </activity>
         <activity
+            android:name=".activities.RideStatusActivity"
+            android:label="@string/title_ride_status" />
+        <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
