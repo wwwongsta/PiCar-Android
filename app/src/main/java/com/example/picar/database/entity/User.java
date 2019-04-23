@@ -13,13 +13,13 @@ public class User {
     public User() {
     }
     @Ignore
-    public User(String email, String password, String family_name, String name, String phone) {
+    public User(String email, String password, String family_name, String name, String phone, boolean isDriver) {
         this.email = email;
         this.password = password;
         this.family_name = family_name;
         this.name = name;
         this.phone = phone;
-        this.isDriver = false;
+        this.isDriver = isDriver;
     }
     
     @PrimaryKey

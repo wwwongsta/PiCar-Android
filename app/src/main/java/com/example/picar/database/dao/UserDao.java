@@ -25,6 +25,8 @@ public interface UserDao {
     void alldelete();
     @Query("SELECT * from users ORDER BY name ASC")
     List<User> getListUser();
+    @Query("SELECT * from users LIMIT 1")
+    User getUser();
     @Query("SELECT * FROM users WHERE name LIKE :email LIMIT 1")
     User get_User_ByEmail(String email);
     @Query("SELECT current_position_id FROM users")
