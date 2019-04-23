@@ -88,7 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:text="@string/title_register"
                 android:onClick="startRegisterActivite"
                 android:clickable="true"
                 android:textColor="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"

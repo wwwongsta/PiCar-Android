@@ -85,6 +85,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private String userEmail;
     private String userPassWord;
+    private TextView sign_up;
 
 
     private TextView afficheApi;
@@ -92,6 +93,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        sign_up = findViewById(R.id.register_text);
+        sign_up.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+              Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+              startActivity(i);
+            }
+        });
         afficheApi = findViewById(R.id.content);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
