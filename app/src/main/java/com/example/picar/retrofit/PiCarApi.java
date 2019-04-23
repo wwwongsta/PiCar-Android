@@ -3,6 +3,8 @@ package com.example.picar.retrofit;
 import com.example.picar.database.entity.Position;
 import com.example.picar.retrofit.model.type_message.Message;
 import com.example.picar.database.entity.User;
+import com.example.picar.retrofit.model.type_message.MessageUserEmailApproval;
+import com.example.picar.retrofit.model.user_type.UserEmail;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.example.picar.retrofit.model.user_type.UserLogin;
 
@@ -26,7 +28,7 @@ public interface PiCarApi {
     Call<Message> createUser(@Body User user);
 
     @POST("user/emailCheck")
-    Call<UserInfo> checkEmail(@Body UserLogin user);
+    Call<MessageUserEmailApproval> checkEmail(@Body UserEmail email);
 
     @POST("user")
     Call<UserInfo> getUserByEmail(@Header("authorization") String token,@Body UserLogin user);

@@ -8,6 +8,7 @@ import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -134,7 +135,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
-
+    public void startRegisterActivite(View view) {
+        startActivity(new Intent(this,RegisterActivity.class));
+    }
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;

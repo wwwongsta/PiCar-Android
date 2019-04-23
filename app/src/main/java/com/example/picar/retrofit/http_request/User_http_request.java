@@ -7,9 +7,10 @@ import com.example.picar.database.entity.Position;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.model.type_message.Message;
 import com.example.picar.database.entity.User;
+import com.example.picar.retrofit.model.type_message.MessageUserEmailApproval;
+import com.example.picar.retrofit.model.user_type.UserEmail;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.example.picar.retrofit.model.user_type.UserLogin;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -39,7 +40,7 @@ public class User_http_request {
         default void errorMessage(Call<Message> call, Throwable t){
 
         }
-        default void errorEmail(Call<UserInfo> call, Throwable t){
+        default void errorEmail(Call<MessageUserEmailApproval> call, Throwable t){
 
         }
 
@@ -61,7 +62,7 @@ public class User_http_request {
         default void createUser(Call<Message> call, Response<Message> response){
 
         }
-        default void checkEmail(Call<UserInfo> call, Response<UserInfo> response){
+        default void checkEmail(Call<MessageUserEmailApproval> call, Response<MessageUserEmailApproval> response){
 
         }
 
@@ -94,15 +95,15 @@ public class User_http_request {
         });
 
     }
-    public void checkEmail(UserLogin user){
-        Call<UserInfo> call = api.checkEmail(user);
-        call.enqueue(new Callback<UserInfo>() {
+    public void checkEmail(UserEmail email){
+        Call<MessageUserEmailApproval> call = api.checkEmail(email);
+        call.enqueue(new Callback<MessageUserEmailApproval>() {
             @Override
-            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+            public void onResponse(Call<MessageUserEmailApproval> call, Response<MessageUserEmailApproval> response) {
                 responseHandler.checkEmail(call,response);
             }
             @Override
-            public void onFailure(Call<UserInfo> call, Throwable t) {
+            public void onFailure(Call<MessageUserEmailApproval> call, Throwable t) {
                 errorHandler.errorEmail(call,t);
             }
         });

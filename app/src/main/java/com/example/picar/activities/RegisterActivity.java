@@ -1,8 +1,6 @@
 package com.example.picar.activities;
 
-import android.app.LoaderManager;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,8 +16,8 @@ import com.example.picar.R;
 import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.http_request.User_http_request;
 import com.example.picar.retrofit.model.type_message.Message;
-import com.example.picar.retrofit.model.user_type.UserInfo;
-import com.example.picar.retrofit.model.user_type.UserLogin;
+import com.example.picar.retrofit.model.type_message.MessageUserEmailApproval;
+import com.example.picar.retrofit.model.user_type.UserEmail;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -31,6 +29,9 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
     Button signIn;
     CheckBox visiblePassword;
     private UserCreateTask mAuthTask = null;
+    private UserGetListEmail mGetEmailsTask = null;
+    String emailExits;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +42,6 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
         email = (EditText) findViewById(R.id.Email);
         password = (EditText) findViewById(R.id.Password);
         family_name = findViewById(R.id.FamilyName);
-
-
-
-
-
 
         visiblePassword = (CheckBox)findViewById(R.id.visiblePassword);
         visiblePassword.setOnClickListener(new View.OnClickListener() {
@@ -80,6 +76,24 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
             }
         });
     }
+    public class UserGetListEmail extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(RegisterActivity.this);
+            UserEmail sendThisEmail = new UserEmail(Email);
+            request.checkEmail(sendThisEmail);
+            return true;
+        }
+    }
+    @Override
+    public void checkEmail(Call<MessageUserEmailApproval> call, Response<MessageUserEmailApproval> response) {
+        MessageUserEmailApproval mess = response.body();
+        Log.i("User",response.body().toString());
+        Log.i("User",mess.getMessage());
+        emailExits = mess.getMessage();
+       // Log.i("User",mess.getEmailAlreadyExist().toString()); = A null ?
+    }
 
     public class UserCreateTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -90,6 +104,13 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
             request.createUser(user);
             return true;
         }
+    }
+
+
+
+    @Override
+    public void errorEmail(Call<MessageUserEmailApproval> call, Throwable t) {
+        Log.i("User",call.toString());
     }
 
     @Override
@@ -107,38 +128,58 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
         Password = password.getText().toString();
         FamilyName = family_name.getText().toString();
 
+
+
+        /*
+        *
+        * Vérification de l'existance du email dans la base de donnée
+        *
+        * */
+        mGetEmailsTask = new UserGetListEmail();
+        mGetEmailsTask.execute();
+
         String validName = "^[a-zA-Z0-9_]*$";
         String validPhone = "^[+]?[0-9]{10,13}$";
         String validEmail = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
         String validPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{4,}$";
 
         if(!FamilyName.matches(validName)){
-            Toast.makeText(this,"Invalid Family Name",Toast.LENGTH_LONG).show();
+            family_name.setError("Invalid Family Name");
+            family_name.requestFocus();
             result = false;
 
         }
 
         if(!Name.matches(validName)){
-            Toast.makeText(this,"Invalid Name",Toast.LENGTH_LONG).show();
+            name.setError("Invalid Name");
+            name.requestFocus();
             result = false;
 
         }
         if(!Phone.matches(validPhone)){
-            Toast.makeText(this,"Invalid Phone number",Toast.LENGTH_LONG).show();
+            phone.setError("Invalid Phone");
+            phone.requestFocus();
             result = false;
 
         }
         if(!Email.matches(validEmail)){
-            Toast.makeText(this,"Invalid Email",Toast.LENGTH_LONG).show();
+            email.setError("Invalid Email");
+            email.requestFocus();
             result = false;
 
         }
         if(!Password.matches(validPassword)){
-            Toast.makeText(this,"Invalid Password, must contain at least 1 upper case letter, lower case and a digit",Toast.LENGTH_LONG).show();
+            password.setError("Invalid Password, must contain at least 1 upper case letter, lower case and a digit");
+            password.requestFocus();
             result = false;
 
         }
-
+      //  if(emailExits.equalsIgnoreCase("Email already exist")){
+//            email.setError("Invalid Email, this Email already exist");
+//            email.requestFocus();
+//            result = false;
+           // Toast.makeText(this,"Invalid Email, this Email already exist",Toast.LENGTH_LONG).show();
+       // }
         return result;
     }
 }

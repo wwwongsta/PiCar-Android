@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.picar.activities.SettingsActivity.KEY_PREF_AUTHORIZATION;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -40,8 +38,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
 
-
-            checkLogIn();
+        checkLogIn();
 
 
         super.onCreate(savedInstanceState);
@@ -87,10 +84,9 @@ public class MainActivity extends AppCompatActivity
         });
 
 
-
         Address address;
         try {
-            address = getCoordinatesOfAddress(this,"Montreal");
+            address = getCoordinatesOfAddress(this, "Montreal");
             setTitle(address.getLatitude() + ", " + address.getLongitude());
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,11 +95,13 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
+
     @Override
     protected void onResume() {
         super.onResume();
         TextView test = findViewById(R.id.testUserInfo);
-        GetUserInfo task = new GetUserInfo(this,test);
+        GetUserInfo task = new GetUserInfo(this, test);
         task.execute((Void) null);
     }
 
@@ -111,7 +109,8 @@ public class MainActivity extends AppCompatActivity
 
         private final AppDatabase db;
         private final TextView txt;
-        public GetUserInfo(Context c,TextView t) {
+
+        public GetUserInfo(Context c, TextView t) {
             this.db = AppDatabase.getInstance(c);
             this.txt = t;
         }
@@ -121,7 +120,7 @@ public class MainActivity extends AppCompatActivity
             User user = null;
             List<User> users = db.userDao().getListUser();
             if (users.size() > 0)
-             user = users.get(0);
+                user = users.get(0);
 
             return user;
         }
@@ -131,6 +130,7 @@ public class MainActivity extends AppCompatActivity
             if (user != null)
                 txt.setText(user.toString());
         }
+
         @Override
         protected void onCancelled() {
 
@@ -146,14 +146,14 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public boolean checkLogIn(){
+    public boolean checkLogIn() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean stayLoggedIn = sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false);
 
 
         extras = getIntent().getExtras();
 
-        if(stayLoggedIn != true){
+        if (stayLoggedIn != true) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
         return stayLoggedIn;
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(MainActivity.this, AboutActivity.class));
             return true;
-        } else if (id == R.id.nav_settings){
+        } else if (id == R.id.nav_settings) {
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             return true;
 
