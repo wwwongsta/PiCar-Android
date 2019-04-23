@@ -21,12 +21,15 @@ public class RideStatusActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         if(STATUS.equals("Waiting")){
+            //waiting response
             rideStatus.setText(STATUS+"...");
         }else if(STATUS.equals("Validated")){
             Toast.makeText(this, STATUS, Toast.LENGTH_LONG).show();
             rideStatus.setText("Retreiving Driver Info");
+            //go back to maps and see driver pulling up
         }else if(STATUS.equals("Refused")){
-            rideStatus.setText("Refused");
+            Toast.makeText(this, STATUS, Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 }
