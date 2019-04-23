@@ -10,12 +10,14 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +32,7 @@ import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.database.entity.Position;
+import com.example.picar.retrofit.http_request.User_http_request;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -61,12 +64,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError
+        , User_http_request.UserHttpResponse {
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
     private String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
 
+
+    private PutPositionTask mAuthTask = null;
 //    private String GEOFENCE_REQ_ID = "myGeofence";
 //    private PendingIntent geofencePendingI;
     // The entry points to the Places API.
@@ -157,6 +163,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setCurrentLocation(ed_location);
                 setDestinationLocation(ed_destination);
                 if(mCurrentAddress != null && mDestinationAddress != null){
                     mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
@@ -182,16 +189,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                    String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
                    String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
 
-//                    //pour test car on a pas de user encore
-//                    String currentLocationId = "5cb0f5ac5781820017b60bab";
-//                    String destinationId = "5cb0f5ac5781820017b60baa";
 
-                    updatePosition(currentLocationId, mCurrentMarkerOptions);
-                    updatePosition(destinationId, mDestinationMarkerOptions);
-                    btn_destination.setVisibility(View.GONE);
-                    ed_destination.setVisibility(View.GONE);
-                    btn_location.setVisibility(View.GONE);
-                    ed_location.setVisibility(View.GONE);
+                    mAuthTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
+                    mAuthTask.execute((Void) null);
+                    mAuthTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
+                    mAuthTask.execute((Void) null);
+
                 }
             }
         });
@@ -334,11 +337,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
+
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -370,10 +369,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
         try {
             if (mLocationPermissionGranted) {
                 Task locationResult = mFusedLocationProviderClient.getLastLocation();
@@ -400,37 +395,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
-//    private Geofence getGeofence() {
-//        //geofence around user
-//        return new Geofence.Builder()
-//                .setRequestId(GEOFENCE_REQ_ID)
-//                // geofence position and his range in meters.
-//                .setCircularRegion(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 2000.0f)
-//                // idk what this is.
-//                .setExpirationDuration(60 * 60 * 1000)
-//                // for detecting when something enter de geofence
-//                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL)
-//                .build();
-//    }
-//
-//    private GeofencingRequest getGeofencingRequest() {
-//        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-//        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-//        builder.addGeofence(getGeofence());
-//        return builder.build();
-//    }
-//
-//
-//    private PendingIntent createGeofencePendingI() {
-//        if (geofencePendingI != null)
-//            return geofencePendingI;
-//
-//        Intent i = new Intent(this, GeofenceService.class);
-//        geofencePendingI = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-//        return geofencePendingI;
-//
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -480,6 +444,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return url;
 
     }
+
+    public class PutPositionTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        private final String mId;
+        //        private final String mPosition;
+        private final MarkerOptions mMarkerOptions;
+
+        PutPositionTask(String id, MarkerOptions markerOptions) {
+            mId = id;
+            mMarkerOptions = markerOptions;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            Position position = new Position(mMarkerOptions.getPosition().latitude, mMarkerOptions.getPosition().longitude);
+
+            request.PutPosition(token, mId, position);
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mAuthTask = null;
+            //showProgress(false);
+
+            if (success) {
+                // finish();
+            } else {
+                //mPasswordView.setError(getString(R.string.error_incorrect_password));
+                // mPasswordView.requestFocus();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            //showProgress(false);
+        }
+
+
+    }
+
+
+
+
 
 
 }
