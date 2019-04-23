@@ -279,6 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         locationSearch = (EditText) findViewById(R.id.editText_location);
 
+
         // Prompt the user for permission.
         getLocationPermission();
 
