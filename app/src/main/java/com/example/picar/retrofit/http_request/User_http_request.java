@@ -132,7 +132,7 @@ public class User_http_request {
     }
 
     public void PutPosition(String token, String id, Position position){
-        Call<Position> call = api.getPosition(token, id, position);
+        Call<Position> call = api.putPosition(token, id, position);
         call.enqueue(new Callback<Position>() {
             @Override
             public void onResponse(Call<Position> call, Response<Position> response) {

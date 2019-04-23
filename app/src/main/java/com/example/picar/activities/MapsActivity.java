@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
+import com.example.picar.database.entity.User;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
@@ -224,8 +225,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_rides.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MapsActivity.this,CardViewActivity.class);
-                startActivity(i);
+
+                User user = (User) AppDatabase.getInstance(v.getContext()).userDao().getListUser();
+
+                if(user.isDriver()){
+
+                }
+                else {
+                    Intent i = new Intent(MapsActivity.this,CardViewActivity.class);
+                    startActivity(i);
+                }
+
             }
         });
 

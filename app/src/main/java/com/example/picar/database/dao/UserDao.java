@@ -31,5 +31,7 @@ public interface UserDao {
     String getUserCurrentPositionId();
     @Query("SELECT destination_id FROM users")
     String getDestinationId();
+    @Query("UPDATE users SET isDriver=:bool")
+    void updateIsDriver(boolean bool);
 
 }

@@ -19,6 +19,7 @@ public class User {
         this.family_name = family_name;
         this.name = name;
         this.phone = phone;
+        this.isDriver = false;
     }
     
     @PrimaryKey
@@ -52,6 +53,9 @@ public class User {
 
     @ColumnInfo(name = "user_photo")
     private String user_photo;
+
+    @ColumnInfo(name = "isDriver")
+    private boolean isDriver;
 
     public String get_id() {
         return _id;
@@ -121,8 +125,17 @@ public class User {
         return current_position_id;
     }
 
+    public boolean isDriver() {
+        return isDriver;
+    }
+
+    public void setDriver(boolean driver) {
+        isDriver = driver;
+    }
+
     public void setCurrent_position_id(String current_position_id) {
         this.current_position_id = current_position_id;
+
     }
 
     public String getDestination_id() {

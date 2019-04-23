@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity
         driverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AppDatabase.getInstance(v.getContext()).userDao().updateIsDriver(true);
                 Intent driver = new Intent(MainActivity.this, MapsActivity.class);
                 driver.putExtra("type", "Driver");
                 startActivity(driver);
@@ -81,6 +82,8 @@ public class MainActivity extends AppCompatActivity
                 startActivity(passager);
             }
         });
+
+
 
         Address address;
         try {
