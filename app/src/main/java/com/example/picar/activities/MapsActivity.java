@@ -215,17 +215,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_rides.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 //if driver
-                if(user.isDriver()){
-
-                }
-                else {
+                if(!user.isDriver()){
                     Intent i = new Intent(MapsActivity.this,CardViewActivity.class);
                     startActivity(i);
                 }
-
             }
         });
 
