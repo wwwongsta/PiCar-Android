@@ -112,6 +112,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String TYPE;
 
+    private User user;
+
     Button btn_rides;
     Button btn_location;
     Button btn_destination;
@@ -161,6 +163,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final EditText ed_destination = findViewById(R.id.editText_destination);
         final EditText ed_location =  findViewById(R.id.editText_location);
 
+        user = (User) AppDatabase.getInstance(this).userDao().getUser();
+
         btn_destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,7 +194,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                    String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
                    String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
 
-
                     mAuthTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
                     mAuthTask.execute((Void) null);
                     mAuthTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
@@ -213,8 +216,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
 
-                User user = (User) AppDatabase.getInstance(v.getContext()).userDao().getUser();
 
+                //if driver
                 if(user.isDriver()){
 
                 }

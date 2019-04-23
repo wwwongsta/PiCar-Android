@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity
         passengerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AppDatabase.getInstance(v.getContext()).userDao().updateIsDriver(false);
                 Intent passager = new Intent(MainActivity.this, MapsActivity.class);
                 passager.putExtra("type", "Passager");
                 startActivity(passager);
