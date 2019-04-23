@@ -213,7 +213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
 
-                User user = (User) AppDatabase.getInstance(v.getContext()).userDao().getListUser();
+                User user = (User) AppDatabase.getInstance(v.getContext()).userDao().getUser();
 
                 if(user.isDriver()){
 

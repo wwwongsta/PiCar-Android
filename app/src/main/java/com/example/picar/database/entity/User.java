@@ -21,6 +21,16 @@ public class User {
         this.phone = phone;
         this.isDriver = isDriver;
     }
+
+    @Ignore
+    public User(String email, String password, String family_name, String name, String phone) {
+        this.email = email;
+        this.password = password;
+        this.family_name = family_name;
+        this.name = name;
+        this.phone = phone;
+
+    }
     
     @PrimaryKey
     @NonNull
