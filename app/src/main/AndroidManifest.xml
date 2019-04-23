@@ -46,9 +46,6 @@
             android:name=".activities.RegisterActivity"
             android:label="@string/title_register" />
         <activity
-            android:name=".activities.CardViewActivity"
-            android:label="@string/title_activity_card_view" />
-        <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
@@ -62,6 +59,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
+        <activity
+            android:name=".activities.RideStatusActivity"
+            android:label="@string/title_ride_status" />
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"

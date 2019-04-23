@@ -17,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,7 +34,6 @@ import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.database.entity.Position;
 import com.example.picar.retrofit.http_request.User_http_request;
-import com.example.picar.retrofit.model.user_type.UserLogin;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -71,6 +71,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
     private String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
+
+
     private PutPositionTask mAuthTask = null;
 //    private String GEOFENCE_REQ_ID = "myGeofence";
 //    private PendingIntent geofencePendingI;
@@ -97,8 +99,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private MarkerOptions mCurrentMarkerOptions;
     private MarkerOptions mDestinationMarkerOptions;
-
-
 
     private Polyline currentPolyline;
 
@@ -164,6 +164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setCurrentLocation(ed_location);
                 setDestinationLocation(ed_destination);
                 if(mCurrentAddress != null && mDestinationAddress != null){
                     mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
@@ -186,29 +187,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     mMap.animateCamera(cu);
 
-
-
                    String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
                    String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
-//
-//
+
+
                     mAuthTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
                     mAuthTask.execute((Void) null);
                     mAuthTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
                     mAuthTask.execute((Void) null);
 
-//                    //pour test car on a pas de user encore
-//                    String currentLocationId = "5cb0f5ac5781820017b60bab";
-//                    String destinationId = "5cb0f5ac5781820017b60baa";
-
-
-//
-//                    updatePosition(currentLocationId, mCurrentMarkerOptions);
-//                    updatePosition(destinationId, mDestinationMarkerOptions);
-//                    btn_destination.setVisibility(View.GONE);
-//                    ed_destination.setVisibility(View.GONE);
-//                    btn_location.setVisibility(View.GONE);
-//                    ed_location.setVisibility(View.GONE);
                 }
             }
         });
@@ -360,11 +347,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
+
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -396,10 +379,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
         try {
             if (mLocationPermissionGranted) {
                 Task locationResult = mFusedLocationProviderClient.getLastLocation();
@@ -426,37 +405,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
-//    private Geofence getGeofence() {
-//        //geofence around user
-//        return new Geofence.Builder()
-//                .setRequestId(GEOFENCE_REQ_ID)
-//                // geofence position and his range in meters.
-//                .setCircularRegion(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 2000.0f)
-//                // idk what this is.
-//                .setExpirationDuration(60 * 60 * 1000)
-//                // for detecting when something enter de geofence
-//                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL)
-//                .build();
-//    }
-//
-//    private GeofencingRequest getGeofencingRequest() {
-//        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-//        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-//        builder.addGeofence(getGeofence());
-//        return builder.build();
-//    }
-//
-//
-//    private PendingIntent createGeofencePendingI() {
-//        if (geofencePendingI != null)
-//            return geofencePendingI;
-//
-//        Intent i = new Intent(this, GeofenceService.class);
-//        geofencePendingI = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-//        return geofencePendingI;
-//
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -507,12 +455,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
     public class PutPositionTask extends AsyncTask<Void, Void, Boolean> {
 
 
         private final String mId;
-//        private final String mPosition;
+        //        private final String mPosition;
         private final MarkerOptions mMarkerOptions;
 
         PutPositionTask(String id, MarkerOptions markerOptions) {
@@ -535,10 +482,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //showProgress(false);
 
             if (success) {
-               // finish();
+                // finish();
             } else {
                 //mPasswordView.setError(getString(R.string.error_incorrect_password));
-               // mPasswordView.requestFocus();
+                // mPasswordView.requestFocus();
             }
         }
 
@@ -550,6 +497,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
+
 
 
 

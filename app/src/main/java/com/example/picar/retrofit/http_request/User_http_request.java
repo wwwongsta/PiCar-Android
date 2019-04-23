@@ -51,9 +51,11 @@ public class User_http_request {
 
         }
 
-        default void errorPutPosition(Call<Position> call, Throwable t){
+
+        default void errorGetPosition(Call<Position> call, Throwable t){
 
         }
+
     }
     public interface UserHttpResponse{
         default void createUser(Call<Message> call, Response<Message> response){
@@ -71,7 +73,10 @@ public class User_http_request {
 
         }
 
-        default void PutPosition(Call<Position> call, Response<Position> response){
+        default  void getPosition(Call<Position> call, Response<Position> response){
+
+        }
+        default void rideStatus(Call<Message> call, Response<Message> response){
 
         }
     }
@@ -136,12 +141,12 @@ public class User_http_request {
         call.enqueue(new Callback<Position>() {
             @Override
             public void onResponse(Call<Position> call, Response<Position> response) {
-                responseHandler.PutPosition(call, response);
+                responseHandler.getPosition(call, response);
             }
 
             @Override
             public void onFailure(Call<Position> call, Throwable t) {
-                errorHandler.errorPutPosition(call, t);
+                errorHandler.errorGetPosition(call, t);
             }
 
         });
