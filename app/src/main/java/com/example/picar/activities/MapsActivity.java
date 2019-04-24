@@ -44,9 +44,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -58,6 +60,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -285,6 +289,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+
+        //Get driver position et put the marker on the map
+        moveDriver();
     }
 
     @Override
@@ -342,6 +349,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
             return null;
         }
+    }
+    private void moveDriver(){
+        if (mMap == null) {
+            return;
+        }
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                MarkerOptions markerOptions =  new MarkerOptions()
+                        .position(new LatLng(12,12))
+                        .title("Driver :")
+                        .snippet("Estimated arrival time")
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.voiture_icon))
+                        .infoWindowAnchor(0.5f, 0.5f);
+                Marker m = mMap.addMarker(markerOptions);
+            }
+        }, 0, 1000);
     }
 
     private void getLocationPermission() {
@@ -469,7 +493,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         protected Boolean doInBackground(Void... params) {
             User_http_request request = new User_http_request(MapsActivity.this);
             Position position = new Position(mMarkerOptions.getPosition().latitude, mMarkerOptions.getPosition().longitude);
-
             request.PutPosition(token, mId, position);
             return true;
         }
