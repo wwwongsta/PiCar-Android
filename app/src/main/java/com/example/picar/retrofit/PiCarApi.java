@@ -3,8 +3,10 @@ package com.example.picar.retrofit;
 import com.example.picar.database.entity.Position;
 import com.example.picar.database.entity.Transit;
 import com.example.picar.database.entity.Transit;
+import com.example.picar.retrofit.model.DriverId;
 import com.example.picar.retrofit.model.DriverInfoForTransit;
 import com.example.picar.retrofit.model.PassengerID;
+import com.example.picar.retrofit.model.PositionDestination;
 import com.example.picar.retrofit.model.StatusInfo;
 import com.example.picar.retrofit.model.StatusUpdateResponse;
 import com.example.picar.retrofit.model.type_message.Message;
@@ -69,4 +71,9 @@ public interface PiCarApi {
     @POST("/transit/passager/del/{id}")
     Call<StatusUpdateResponse> delPassager(@Path("id") String idDriver, @Body PassengerID passageId);
 
+    @GET("user/byId/{id}")
+    Call<UserInfo> getUserById(@Path("id") String idUser);
+
+    @POST("/transit/calculate")
+    Call<List<DriverId>> getNearByDriver(@Body PositionDestination posDest);
 }
