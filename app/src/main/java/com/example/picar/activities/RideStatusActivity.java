@@ -1,5 +1,6 @@
 package com.example.picar.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ProgressBar;
@@ -7,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.picar.R;
+import com.example.picar.database.AppDatabase;
 import com.example.picar.database.entity.Transit;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.model.StatusUpdateResponse;
@@ -26,6 +28,7 @@ public class RideStatusActivity extends AppCompatActivity {
     ProgressBar progressBar;
     String STATUS = "";
     private PiCarApi api;
+    String driver_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,7 @@ public class RideStatusActivity extends AppCompatActivity {
             public void onResponse(Call<Transit> call, Response<Transit> response) {
                 Transit transits = response.body();
                 List<Transit.Passager> passager = transits.getPassager();
-
+                driver_id = transits.getDriverId();
                 for(Transit.Passager p : passager){
                     if(p.getPassagerId().equals("5cbf6de5294550001707e016")){
                         STATUS += p.getPassagerStatus();
@@ -59,8 +62,8 @@ public class RideStatusActivity extends AppCompatActivity {
                 return;
             }
         });
-
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        Timer my_timer = new Timer("my_timer");
+        my_timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
         if(!STATUS.equals("validated") || !STATUS.equals("refused")){
@@ -69,9 +72,15 @@ public class RideStatusActivity extends AppCompatActivity {
         }
         if(STATUS.equals("validated")){
             rideStatus.setText("Retreiving Driver Info");
-            //go back to maps and see driver pulling up
+            Intent passager = new Intent(RideStatusActivity.this, MapsActivity.class);
+            passager.putExtra("type", "Passager");
+            passager.putExtra("status", "validated");
+            passager.putExtra("driver_id", driver_id);
+            startActivity(passager);
+            my_timer.cancel();
         }
         if(STATUS.equals("refused")){
+            my_timer.cancel();
             finish();
         }
             }

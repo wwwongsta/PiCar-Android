@@ -121,7 +121,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PiCarApi api;
 
     private String TYPE;
-
+    private String validated="";
+    private String driver_id;
     private User user;
 
     Button btn_rides;
@@ -142,6 +143,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(intent.hasExtra("type")){
             TYPE = intent.getStringExtra("type");
         }
+        if(intent.hasExtra("status")){
+            validated = intent.getStringExtra("status");
+            driver_id = intent.getStringExtra("driver_id");
+        }
+
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -265,7 +271,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+        if(!validated.equals("")){
+            btn_rides.setVisibility(View.GONE);
+            btn_location.setVisibility(View.GONE);
+            btn_destination.setVisibility(View.GONE);
+            ed_destination.setVisibility(View.GONE);
+            ed_location.setVisibility(View.GONE);
 
+        }
         if(TYPE.equals("Driver")){
             btn_rides.setText("Start ride");
         }
