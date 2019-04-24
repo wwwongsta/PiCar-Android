@@ -26,6 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RideStatusActivity extends AppCompatActivity {
     TextView rideStatus;
     ProgressBar progressBar;
+    //change when we have passengers
     String STATUS = "validated";
     private PiCarApi api;
     String driver_id;
