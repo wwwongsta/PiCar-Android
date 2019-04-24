@@ -2,6 +2,11 @@ package com.example.picar.retrofit;
 
 import com.example.picar.database.entity.Position;
 import com.example.picar.database.entity.Transit;
+import com.example.picar.database.entity.Transit;
+import com.example.picar.retrofit.model.DriverInfoForTransit;
+import com.example.picar.retrofit.model.PassengerID;
+import com.example.picar.retrofit.model.StatusInfo;
+import com.example.picar.retrofit.model.StatusUpdateResponse;
 import com.example.picar.retrofit.model.type_message.Message;
 import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.model.type_message.MessageUserEmailApproval;
@@ -46,9 +51,19 @@ public interface PiCarApi {
 //    @PUT("position/{id}")
 //    Call<Position> getPosition(@Header("authorization") String token,@Path("id") String id, @Body Position position);
 
-//    @GET("transit/{id}")
-//    Call<Transit>
+    @POST("/transit/add")
+    Call<Transit> createTransit(@Body DriverInfoForTransit transit);
+
+    @PUT("transit/status")
+    Call<StatusUpdateResponse> createTransit(@Body StatusInfo status);
 
     @GET("transit/get/{id}")
     Call<Transit> getTransit(@Path("id") String id);
+
+    @POST("/transit/passager/add/{id}")
+    Call<Transit> addPassager(@Path("id") String idDriver, @Body PassengerID passageId);
+
+    @POST("/transit/passager/del/{id}")
+    Call<StatusUpdateResponse> delPassager(@Path("id") String idDriver, @Body PassengerID passageId);
+
 }
