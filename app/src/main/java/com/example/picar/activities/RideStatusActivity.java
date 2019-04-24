@@ -29,6 +29,8 @@ public class RideStatusActivity extends AppCompatActivity {
     String STATUS = "";
     private PiCarApi api;
     String driver_id;
+    String driver_location_id;
+    String driver_destination_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,7 @@ public class RideStatusActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         api = retrofit.create(PiCarApi.class);
-        Call<Transit> call = api.getTransit("5cb108645a33a30017af6e7d");
+        Call<Transit> call = api.getTransit("5cc0cba41b30070017e13fc2");
 
         call.enqueue(new Callback<Transit>() {
             @Override
@@ -49,6 +51,8 @@ public class RideStatusActivity extends AppCompatActivity {
                 Transit transits = response.body();
                 List<Transit.Passager> passager = transits.getPassager();
                 driver_id = transits.getDriverId();
+                driver_location_id = transits.getDriver_current_position_id();
+                driver_destination_id = transits.getDriver_destination_position_id();
                 for(Transit.Passager p : passager){
                     if(p.getPassagerId().equals("5cbf6de5294550001707e016")){
                         STATUS += p.getPassagerStatus();
@@ -76,6 +80,9 @@ public class RideStatusActivity extends AppCompatActivity {
             passager.putExtra("type", "Passager");
             passager.putExtra("status", "validated");
             passager.putExtra("driver_id", driver_id);
+            passager.putExtra("driver_current_location_id", driver_location_id);
+            passager.putExtra("driver_destination_id", driver_destination_id);
+
             startActivity(passager);
             my_timer.cancel();
         }
