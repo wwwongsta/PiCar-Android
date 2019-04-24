@@ -194,33 +194,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 setCurrentLocation(ed_location);
                 setDestinationLocation(ed_destination);
                 if(mCurrentAddress != null && mDestinationAddress != null){
-                    mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
-                    ArrayList<MarkerOptions> markers = new ArrayList<>();
-                    markers.add(mCurrentMarkerOptions);
-                    markers.add(mDestinationMarkerOptions);
-                    new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
-
-
-                    //show all marker on the map
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    for (MarkerOptions marker : markers) {
-                        builder.include(marker.getPosition());
-                    }
-                    LatLngBounds bounds = builder.build();
-
-                    int padding = 500; // offset from edges of the map in pixels
-                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-                    mMap.animateCamera(cu);
-
-                   String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
-                   String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
-
-                    putPositionTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
-                    putPositionTask.execute((Void) null);
-                    putPositionTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
-                    putPositionTask.execute((Void) null);
-
+                    setUpMarkers(v);
                 }
             }
         });
@@ -237,8 +211,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_rides.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 //if driver
                 if(user.isDriver()){
                     Handler handler = new Handler();
@@ -281,6 +253,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(TYPE.equals("Driver")){
             btn_rides.setText("Start ride");
         }
+    }
+
+    private void setUpMarkers(View v) {
+        mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
+        mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
+        ArrayList<MarkerOptions> markers = new ArrayList<>();
+        markers.add(mCurrentMarkerOptions);
+        markers.add(mDestinationMarkerOptions);
+        new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+
+
+        //show all marker on the map
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (MarkerOptions marker : markers) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+
+        int padding = 500; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+        mMap.animateCamera(cu);
+
+        String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
+        String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
+
+        putPositionTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
+        putPositionTask.execute((Void) null);
+        putPositionTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
+        putPositionTask.execute((Void) null);
     }
 
     private void updatePosition(String id, MarkerOptions marker) {
