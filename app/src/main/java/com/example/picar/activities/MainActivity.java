@@ -9,9 +9,7 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.picar.R;
@@ -31,8 +30,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.picar.activities.SettingsActivity.KEY_PREF_AUTHORIZATION;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -42,8 +39,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
 
-
-            checkLogIn();
+        checkLogIn();
 
 
         super.onCreate(savedInstanceState);
@@ -55,14 +51,6 @@ public class MainActivity extends AppCompatActivity
          */
 //        Intent i = new Intent(this,RetrofitActivity.class);
 //        startActivity(i);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -73,7 +61,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Button driverButton = (Button) findViewById(R.id.button_driver);
+        ImageButton driverButton = (ImageButton) findViewById(R.id.button_driver);
         driverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,7 +73,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        Button passengerButton = (Button) findViewById(R.id.button_passenger);
+        ImageButton passengerButton = (ImageButton) findViewById(R.id.button_passenger);
         passengerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,10 +85,9 @@ public class MainActivity extends AppCompatActivity
         });
 
 
-
         Address address;
         try {
-            address = getCoordinatesOfAddress(this,"Montreal");
+            address = getCoordinatesOfAddress(this, "Montreal");
             setTitle(address.getLatitude() + ", " + address.getLongitude());
         } catch (IOException e) {
             e.printStackTrace();
@@ -109,19 +96,22 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
+
     @Override
     protected void onResume() {
         super.onResume();
-        TextView test = findViewById(R.id.testUserInfo);
-        GetUserInfo task = new GetUserInfo(this,test);
-        task.execute((Void) null);
+        //TextView test = findViewById(R.id.testUserInfo);
+        //GetUserInfo task = new GetUserInfo(this,test);
+       // task.execute((Void) null);
     }
 
     public class GetUserInfo extends AsyncTask<Void, Void, User> {
 
         private final AppDatabase db;
         private final TextView txt;
-        public GetUserInfo(Context c,TextView t) {
+
+        public GetUserInfo(Context c, TextView t) {
             this.db = AppDatabase.getInstance(c);
             this.txt = t;
         }
@@ -131,7 +121,7 @@ public class MainActivity extends AppCompatActivity
             User user = null;
             List<User> users = db.userDao().getListUser();
             if (users.size() > 0)
-             user = users.get(0);
+                user = users.get(0);
 
             return user;
         }
@@ -141,6 +131,7 @@ public class MainActivity extends AppCompatActivity
             if (user != null)
                 txt.setText(user.toString());
         }
+
         @Override
         protected void onCancelled() {
 
@@ -156,14 +147,14 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public boolean checkLogIn(){
+    public boolean checkLogIn() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean stayLoggedIn = sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false);
 
 
         extras = getIntent().getExtras();
 
-        if(stayLoggedIn != true){
+        if (stayLoggedIn != true) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
         return stayLoggedIn;
@@ -217,7 +208,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(MainActivity.this, AboutActivity.class));
             return true;
-        } else if (id == R.id.nav_settings){
+        } else if (id == R.id.nav_settings) {
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             return true;
 

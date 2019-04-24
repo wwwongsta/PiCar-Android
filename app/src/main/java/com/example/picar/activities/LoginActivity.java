@@ -8,6 +8,7 @@ import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -84,6 +85,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private String userEmail;
     private String userPassWord;
+    private TextView sign_up;
 
 
     private TextView afficheApi;
@@ -91,6 +93,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        sign_up = findViewById(R.id.register_text);
+        sign_up.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+              Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+              startActivity(i);
+            }
+        });
         afficheApi = findViewById(R.id.content);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -134,7 +144,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
-
+    public void startRegisterActivite(View view) {
+        startActivity(new Intent(this,RegisterActivity.class));
+    }
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
