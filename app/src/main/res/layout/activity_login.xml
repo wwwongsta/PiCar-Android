@@ -87,11 +87,11 @@
                 android:id="@+id/register_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
                 android:gravity="right"
                 android:onClick="startRegisterActivite"
-                android:clickable="true"
-                android:textColor="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
-                />
+                android:text="@string/title_register"
+                android:textColor="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color" />
 
             <TextView
                 android:id="@+id/content"
