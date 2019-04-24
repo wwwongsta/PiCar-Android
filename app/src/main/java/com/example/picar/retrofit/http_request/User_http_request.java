@@ -6,6 +6,7 @@ import android.util.Log;
 import com.example.picar.database.entity.Position;
 import com.example.picar.database.entity.Transit;
 import com.example.picar.retrofit.PiCarApi;
+import com.example.picar.retrofit.model.DriverInfoForTransit;
 import com.example.picar.retrofit.model.type_message.Message;
 import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.model.type_message.MessageUserEmailApproval;
@@ -57,9 +58,10 @@ public class User_http_request {
         default void errorGetPosition(Call<Position> call, Throwable t){
 
         }
-        default void errorGetTransit(Call<Transit> call, Throwable t){
+        default void errorGetTransit(Call<DriverInfoForTransit> call, Throwable t){
 
         }
+
     }
     public interface UserHttpResponse{
         default void createUser(Call<Message> call, Response<Message> response){
@@ -81,9 +83,26 @@ public class User_http_request {
 
         }
 
-        default void getTransit(Call<Transit> call, Response<Transit> response){
+        default void getTransit(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response){
 
         }
+    }
+
+    public void getTransit(String idDriver){
+
+        Call<DriverInfoForTransit> call = api.getTransit(idDriver);
+        call.enqueue(new Callback<DriverInfoForTransit>() {
+            @Override
+            public void onResponse(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
+                responseHandler.getTransit(call,response);
+
+            }
+            @Override
+            public void onFailure(Call<DriverInfoForTransit> call, Throwable t) {
+                errorHandler.errorGetTransit(call,t);
+            }
+        });
+
     }
     public void createUser(User user){
         Call<Message> call = api.createUser(user);

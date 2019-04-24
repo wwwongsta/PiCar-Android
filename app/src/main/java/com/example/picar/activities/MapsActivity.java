@@ -2,7 +2,6 @@ package com.example.picar.activities;
 
 
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,14 +12,12 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,19 +25,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
+import com.example.picar.database.entity.Position;
 import com.example.picar.database.entity.User;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.database.entity.Position;
 import com.example.picar.retrofit.http_request.User_http_request;
+import com.example.picar.retrofit.model.DriverInfoForTransit;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -51,13 +45,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,8 +73,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private PutPositionTask putPositionTask = null;
+    private GetTransitWithDriveID getTransitWithDriveID = null;
 
-   // private GetTransitTask getTransitTask = null
+    // private GetTransitTask getTransitTask = null
 //    private String GEOFENCE_REQ_ID = "myGeofence";
 //    private PendingIntent geofencePendingI;
     // The entry points to the Places API.
@@ -126,12 +119,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button btn_rides;
     Button btn_location;
     Button btn_destination;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        if(intent.hasExtra("type")){
+        if (intent.hasExtra("type")) {
             TYPE = intent.getStringExtra("type");
         }
 
@@ -165,12 +159,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        btn_location =  findViewById(R.id.search_button_location);
+        btn_location = findViewById(R.id.search_button_location);
         btn_destination = findViewById(R.id.search_button_destination);
         btn_rides = findViewById(R.id.search_button_ride);
 
         final EditText ed_destination = findViewById(R.id.editText_destination);
-        final EditText ed_location =  findViewById(R.id.editText_location);
+        final EditText ed_location = findViewById(R.id.editText_location);
 
         user = (User) AppDatabase.getInstance(this).userDao().getUser();
 
@@ -179,7 +173,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 setCurrentLocation(ed_location);
                 setDestinationLocation(ed_destination);
-                if(mCurrentAddress != null && mDestinationAddress != null){
+                if (mCurrentAddress != null && mDestinationAddress != null) {
                     mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
                     mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
                     ArrayList<MarkerOptions> markers = new ArrayList<>();
@@ -200,8 +194,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     mMap.animateCamera(cu);
 
-                   String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
-                   String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
+                    String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
+                    String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
 
                     putPositionTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
                     putPositionTask.execute((Void) null);
@@ -215,7 +209,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(ed_destination!=null){
+                if (ed_destination != null) {
                     setCurrentLocation(ed_location);
                 }
             }
@@ -225,14 +219,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
 
-
                 //if driver
-                if(user.isDriver()){
+                if (user.isDriver()) {
                     Handler handler = new Handler();
                     int delay = 5000; //milliseconds
 
-                    handler.postDelayed(new Runnable(){
-                        public void run(){
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
                             String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
                             MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
 
@@ -240,6 +233,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
                             putPositionTask.execute((Void) null);
                             handler.postDelayed(this, delay);
+
+                            //getTransitWithDriveID = new GetTransitWithDriveID()
+
                         }
                     }, delay);
 
@@ -248,32 +244,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.moveCamera(center);
                     mMap.animateCamera(zoom);
 
-                }
-                else {
+                } else {
 
-                    Intent i = new Intent(MapsActivity.this,CardViewActivity.class);
+                    Intent i = new Intent(MapsActivity.this, CardViewActivity.class);
                     startActivity(i);
                 }
 
             }
         });
 
-        if(TYPE.equals("Driver")){
+        if (TYPE.equals("Driver")) {
             btn_rides.setText("Start ride");
         }
     }
 
+
     private void updatePosition(String id, MarkerOptions marker) {
         Position position = new Position(marker.getPosition().latitude, marker.getPosition().longitude);
 
-        Call<Position> call = api.putPosition(token,id, position);
+        Call<Position> call = api.putPosition(token, id, position);
 
         call.enqueue(new Callback<Position>() {
             @Override
-            public void onResponse(Call<Position> call, Response<Position> response) {            }
+            public void onResponse(Call<Position> call, Response<Position> response) {
+            }
 
             @Override
-            public void onFailure(Call<Position> call, Throwable t) {            }
+            public void onFailure(Call<Position> call, Throwable t) {
+            }
         });
 
     }
@@ -303,7 +301,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
@@ -331,11 +328,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currentPolyline = mMap.addPolyline((PolylineOptions) values[0]);
     }
 
-    public void setCurrentLocation(View view){
+    public void setCurrentLocation(View view) {
         mCurrentAddress = onMapSearch((EditText) view);
     }
 
-    public void setDestinationLocation(View view){
+    public void setDestinationLocation(View view) {
         mDestinationAddress = onMapSearch((EditText) view);
     }
 
@@ -380,20 +377,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
     }
-    private void moveDriver(){
+
+    private void moveDriver() {
         if (mMap == null) {
             return;
         }
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                MarkerOptions markerOptions =  new MarkerOptions()
-                        .position(new LatLng(12,12))
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(new LatLng(12, 12))
                         .title("Driver :")
                         .snippet("Estimated arrival time")
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.voiture_icon))
                         .infoWindowAnchor(0.5f, 0.5f);
-               // Marker m = mMap.addMarker(markerOptions);
+                // Marker m = mMap.addMarker(markerOptions);
             }
         }, 0, 1000);
     }
@@ -425,7 +423,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -454,7 +452,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
             }
-        } catch(SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -468,11 +466,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    public void confirm(View view){
+    public void confirm(View view) {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
 //                        MapsActivity.this.startActivity(MapsActivity.this, SecondActivity.class);
                         break;
@@ -492,7 +490,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         builder.show();
     }
 
-    private String getUrl(LatLng current, LatLng destination, String directionMode){
+    private String getUrl(LatLng current, LatLng destination, String directionMode) {
         String str_origin = "origin=" + current.latitude + "," + current.longitude;
         // Destination of route
         String str_dest = "destination=" + destination.latitude + "," + destination.longitude;
@@ -550,46 +548,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-//    public class GetTransit extends AsyncTask<Void, Void, Boolean> {
-//
-//
-//
-//
-//        PutPositionTask(String id, MarkerOptions markerOptions) {
-//
-//        }
-//
-//        @Override
-//        protected Boolean doInBackground(Void... params) {
-//            User_http_request request = new User_http_request(MapsActivity.this);
-//            Position position = new Position(mMarkerOptions.getPosition().latitude, mMarkerOptions.getPosition().longitude);
-//
-//            request.PutPosition(token, mId, position);
-//            return true;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(final Boolean success) {
-//            putPositionTask = null;
-//            //showProgress(false);
-//
-//            if (success) {
-//                // finish();
-//            } else {
-//                //mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                // mPasswordView.requestFocus();
-//            }
-//        }
-//
-//        @Override
-//        protected void onCancelled() {
-//            putPositionTask = null;
-//            //showProgress(false);
-//        }
-//
-//
-//    }
+    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
+        String idDriver;
 
+        GetTransitWithDriveID(String id) {
+            idDriver = id;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            request.getTransit(idDriver);
+            return true;
+        }
+    }
+
+    @Override
+    public void getTransit(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
+
+
+    }
 
     public void updateMapAsyncTask() {
         final Handler handler = new Handler();
@@ -621,6 +599,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public class UpdatePositionService extends Service {
         Handler handler;
         Runnable test;
+
         public UpdatePositionService() {
             handler = new Handler();
             test = new Runnable() {
@@ -643,9 +622,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
     }
-
-
-
 
 
 }

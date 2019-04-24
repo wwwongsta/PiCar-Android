@@ -38,6 +38,7 @@ public class RideStatusActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         api = retrofit.create(PiCarApi.class);
+
         Call<Transit> call = api.getTransit("5cb108645a33a30017af6e7d");
 
         call.enqueue(new Callback<Transit>() {
