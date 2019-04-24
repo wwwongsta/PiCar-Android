@@ -36,6 +36,7 @@ import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.http_request.User_http_request;
 import com.example.picar.retrofit.model.DriverInfoForTransit;
+import com.example.picar.retrofit.model.type_message.Message;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -74,8 +75,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String token = "";
 
     private PutPositionTask putPositionTask = null;
-    private GetTransitWithDriveID getTransitWithDriveID = null;
-
+//    private GetTransitWithDriveID getTransitWithDriveID = null;
+//
     // private GetTransitTask getTransitTask = null
 //    private String GEOFENCE_REQ_ID = "myGeofence";
 //    private PendingIntent geofencePendingI;
@@ -248,7 +249,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             putPositionTask.execute((Void) null);
                             handler.postDelayed(this, delay);
 
-                            //getTransitWithDriveID = new GetTransitWithDriveID()
 
                         }
                     }, delay);
@@ -272,6 +272,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             btn_destination.setVisibility(View.GONE);
             ed_destination.setVisibility(View.GONE);
             ed_location.setVisibility(View.GONE);
+
+
+//            getTransitWithDriveID = new GetTransitWithDriveID(driver_id);
+//
+
+
 
         }
         if(TYPE.equals("Driver")){
@@ -569,24 +575,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
-        String idDriver;
-
-        GetTransitWithDriveID(String id) {
-            idDriver = id;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            User_http_request request = new User_http_request(MapsActivity.this);
-            request.getTransit(idDriver);
-            return true;
-        }
-    }
+//    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
+//        String idDriver;
+//
+//        GetTransitWithDriveID(String id) {
+//            idDriver = id;
+//        }
+//
+//        @Override
+//        protected Boolean doInBackground(Void... params) {
+//            User_http_request request = new User_http_request(MapsActivity.this);
+//            request.getTransitforPosition(idDriver);
+//            return true;
+//        }
+//    }
 
     @Override
-    public void getTransit(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
+    public void getTransitforPosition(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
+        DriverInfoForTransit mess = response.body();
 
+
+        Log.i("DriverPosition",mess.getDriver_current_positionID());
 
     }
 

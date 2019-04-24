@@ -26,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RideStatusActivity extends AppCompatActivity {
     TextView rideStatus;
     ProgressBar progressBar;
-    String STATUS = "";
+    String STATUS = "validated";
     private PiCarApi api;
     String driver_id;
 
@@ -42,7 +42,7 @@ public class RideStatusActivity extends AppCompatActivity {
                 .build();
         api = retrofit.create(PiCarApi.class);
 
-        Call<Transit> call = api.getTransit("5cb108645a33a30017af6e7d");
+        Call<Transit> call = api.getTransit("5cc0cba41b30070017e13fc2");
 
         call.enqueue(new Callback<Transit>() {
             @Override
@@ -51,7 +51,7 @@ public class RideStatusActivity extends AppCompatActivity {
                 List<Transit.Passager> passager = transits.getPassager();
                 driver_id = transits.getDriverId();
                 for(Transit.Passager p : passager){
-                    if(p.getPassagerId().equals("5cbf6de5294550001707e016")){
+                    if(p.getPassagerId().equals("5cc0cba41b30070017e13fc2")){
                         STATUS += p.getPassagerStatus();
                     }
                 }
