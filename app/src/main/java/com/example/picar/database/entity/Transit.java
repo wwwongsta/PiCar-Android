@@ -83,7 +83,7 @@ public class Transit {
         this.passager = passagers;
     }
 
-    private class Passager {
+    public class Passager {
 
         private String id;
         private String passagerId;
