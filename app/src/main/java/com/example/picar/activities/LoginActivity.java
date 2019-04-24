@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -382,6 +383,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public void login(Call<UserInfo> call, Response<UserInfo> response){
         UserInfo userInfo = response.body();
+        //userInfo.getAuthorization()
+        //preferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("Authorization",userInfo.getAuthorization());
+        editor.apply();
+
         AddUserInfoToDatabase addUser = new AddUserInfoToDatabase(userInfo, this);
         addUser.execute((Void) null);
         mAuthTask = null;

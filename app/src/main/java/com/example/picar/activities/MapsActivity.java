@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -14,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -69,8 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
-    private String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
-
+    private String token = "";
 
     private PutPositionTask putPositionTask = null;
     private GetTransitWithDriveID getTransitWithDriveID = null;
@@ -113,7 +114,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PiCarApi api;
 
     private String TYPE;
-
+    private String validated="";
+    private String driver_id;
     private User user;
 
     Button btn_rides;
@@ -124,10 +126,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        token = preferences.getString("Authorization", "");
+        if(!token.equalsIgnoreCase(""))
+        {
+            token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
+        }
+
         Intent intent = getIntent();
         if (intent.hasExtra("type")) {
             TYPE = intent.getStringExtra("type");
         }
+        if(intent.hasExtra("status")){
+            validated = intent.getStringExtra("status");
+            driver_id = intent.getStringExtra("driver_id");
+        }
+
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -252,8 +266,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+        if(!validated.equals("")){
+            btn_rides.setVisibility(View.GONE);
+            btn_location.setVisibility(View.GONE);
+            btn_destination.setVisibility(View.GONE);
+            ed_destination.setVisibility(View.GONE);
+            ed_location.setVisibility(View.GONE);
 
-        if (TYPE.equals("Driver")) {
+        }
+        if(TYPE.equals("Driver")){
             btn_rides.setText("Start ride");
         }
     }
