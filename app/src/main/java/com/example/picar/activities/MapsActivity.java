@@ -3,6 +3,7 @@ package com.example.picar.activities;
 
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,8 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -58,6 +61,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -73,7 +78,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
 
 
-    private PutPositionTask mAuthTask = null;
+    private PutPositionTask putPositionTask = null;
+
+   // private GetTransitTask getTransitTask = null
 //    private String GEOFENCE_REQ_ID = "myGeofence";
 //    private PendingIntent geofencePendingI;
     // The entry points to the Places API.
@@ -194,10 +201,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                    String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
                    String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
 
-                    mAuthTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
-                    mAuthTask.execute((Void) null);
-                    mAuthTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
-                    mAuthTask.execute((Void) null);
+                    putPositionTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
+                    putPositionTask.execute((Void) null);
+                    putPositionTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
+                    putPositionTask.execute((Void) null);
 
                 }
             }
@@ -219,6 +226,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //if driver
                 if(user.isDriver()){
+                    Handler handler = new Handler();
+                    int delay = 5000; //milliseconds
+
+                    handler.postDelayed(new Runnable(){
+                        public void run(){
+                            String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
+                            MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                            putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
+                            new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+                            putPositionTask.execute((Void) null);
+                            handler.postDelayed(this, delay);
+                        }
+                    }, delay);
+
 
                 }
                 else {
@@ -230,8 +251,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         if(TYPE.equals("Driver")){
-            btn_rides.setEnabled(false);
-            btn_rides.setVisibility(View.GONE);
+            btn_rides.setText("Start ride");
         }
     }
 
@@ -392,6 +412,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = (Location) task.getResult();
+                            LatLng latLng = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
@@ -482,7 +503,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
+            putPositionTask = null;
             //showProgress(false);
 
             if (success) {
@@ -495,13 +516,106 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         protected void onCancelled() {
-            mAuthTask = null;
+            putPositionTask = null;
             //showProgress(false);
         }
 
 
     }
 
+//    public class GetTransit extends AsyncTask<Void, Void, Boolean> {
+//
+//
+//
+//
+//        PutPositionTask(String id, MarkerOptions markerOptions) {
+//
+//        }
+//
+//        @Override
+//        protected Boolean doInBackground(Void... params) {
+//            User_http_request request = new User_http_request(MapsActivity.this);
+//            Position position = new Position(mMarkerOptions.getPosition().latitude, mMarkerOptions.getPosition().longitude);
+//
+//            request.PutPosition(token, mId, position);
+//            return true;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(final Boolean success) {
+//            putPositionTask = null;
+//            //showProgress(false);
+//
+//            if (success) {
+//                // finish();
+//            } else {
+//                //mPasswordView.setError(getString(R.string.error_incorrect_password));
+//                // mPasswordView.requestFocus();
+//            }
+//        }
+//
+//        @Override
+//        protected void onCancelled() {
+//            putPositionTask = null;
+//            //showProgress(false);
+//        }
+//
+//
+//    }
+
+
+    public void updateMapAsyncTask() {
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask doAsynchronousTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            // PerformBackgroundTask this class is the class that extends AsynchTask
+                            String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
+                            MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                            putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
+                            new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+                            putPositionTask.execute((Void) null);
+
+
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(doAsynchronousTask, 0, 10000); //execute in every 50000 ms
+    }
+
+    public class UpdatePositionService extends Service {
+        Handler handler;
+        Runnable test;
+        public UpdatePositionService() {
+            handler = new Handler();
+            test = new Runnable() {
+                @Override
+                public void run() {
+                    String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
+                    MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                    putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
+                    new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+                    putPositionTask.execute((Void) null);
+                    handler.postDelayed(test, 4000);
+                }
+            };
+
+            handler.postDelayed(test, 0);
+        }
+
+        @Override
+        public IBinder onBind(Intent intent) {
+            return null;
+        }
+    }
 
 
 

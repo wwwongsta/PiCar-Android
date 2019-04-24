@@ -1,6 +1,7 @@
 package com.example.picar.retrofit;
 
 import com.example.picar.database.entity.Position;
+import com.example.picar.database.entity.Transit;
 import com.example.picar.retrofit.model.type_message.Message;
 import com.example.picar.database.entity.User;
 import com.example.picar.retrofit.model.user_type.UserInfo;
@@ -43,5 +44,9 @@ public interface PiCarApi {
 //    @PUT("position/{id}")
 //    Call<Position> getPosition(@Header("authorization") String token,@Path("id") String id, @Body Position position);
 
+//    @GET("transit/{id}")
+//    Call<Transit>
 
+    @GET("transit/get/{id}")
+    Call<Transit> getTransit(@Path("id") String id);
 }
