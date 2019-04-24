@@ -48,8 +48,8 @@ public interface PiCarApi {
     @PUT("position/{id}")
     Call<Position> putPosition(@Header("authorization") String token,@Path("id") String id, @Body Position position);
 
-//    @PUT("position/{id}")
-//    Call<Position> getPosition(@Header("authorization") String token,@Path("id") String id, @Body Position position);
+    @POST("position/{id}")
+    Call<Position> getPosition(@Header("authorization") String token,@Path("id") String id, @Body Position position);
 
     @POST("/transit/add")
     Call<Transit> createTransit(@Body DriverInfoForTransit transit);

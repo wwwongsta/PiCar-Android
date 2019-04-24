@@ -76,6 +76,5 @@ public class RideStatusActivity extends AppCompatActivity {
         }
             }
         }, 0, 1000);
-        Toast.makeText(RideStatusActivity.this, STATUS, Toast.LENGTH_LONG).show();
     }
 }
