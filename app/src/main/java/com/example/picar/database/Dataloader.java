@@ -29,17 +29,17 @@ public class Dataloader {
 //        final List<Transaction> transactions = getTransactionsForTest();
 //        db.transactionDao().insertAll(transactions);
 //
-//        final List<Transit> transits = getTransitsForTest();
+//        final List<TransitInfo> transits = getTransitsForTest();
 //        db.transitDao().insertAll(transits);
 //
 //    }
 //
 //
-//    private static List<Transit> getTransitsForTest() {
-//        List<Transit> transits = new ArrayList<Transit>();
-//        transits.add(new Transit(1, "Métro Cartier à Métro Crémazie"));
-//        transits.add(new Transit(2, "Vieux port de Montréal à Métro Cartier"));
-//        transits.add(new Transit(3, "Palais de justice de Laval à Jardin botanique de Montréal"));
+//    private static List<TransitInfo> getTransitsForTest() {
+//        List<TransitInfo> transits = new ArrayList<TransitInfo>();
+//        transits.add(new TransitInfo(1, "Métro Cartier à Métro Crémazie"));
+//        transits.add(new TransitInfo(2, "Vieux port de Montréal à Métro Cartier"));
+//        transits.add(new TransitInfo(3, "Palais de justice de Laval à Jardin botanique de Montréal"));
 //
 //        return transits;
 //    }

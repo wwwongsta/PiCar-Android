@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.util.Log;
 
 import com.example.picar.database.entity.Position;
+import com.example.picar.database.entity.Transit;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.model.type_message.Message;
 import com.example.picar.database.entity.User;
@@ -56,7 +57,9 @@ public class User_http_request {
         default void errorGetPosition(Call<Position> call, Throwable t){
 
         }
+        default void errorGetTransit(Call<Transit> call, Throwable t){
 
+        }
     }
     public interface UserHttpResponse{
         default void createUser(Call<Message> call, Response<Message> response){
@@ -78,6 +81,10 @@ public class User_http_request {
 
         }
         default void rideStatus(Call<Message> call, Response<Message> response){
+
+        }
+
+        default void getTransit(Call<Transit> call, Response<Transit> response){
 
         }
     }
@@ -152,4 +159,7 @@ public class User_http_request {
 
         });
     }
+
+
+
 }
