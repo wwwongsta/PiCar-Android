@@ -235,6 +235,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         public void run(){
                             String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
                             MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+
                             putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
                             new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
                             putPositionTask.execute((Void) null);
@@ -242,9 +243,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     }, delay);
 
+                    CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                    CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+                    mMap.moveCamera(center);
+                    mMap.animateCamera(zoom);
 
                 }
                 else {
+
                     Intent i = new Intent(MapsActivity.this,CardViewActivity.class);
                     startActivity(i);
                 }
@@ -387,7 +393,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .snippet("Estimated arrival time")
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.voiture_icon))
                         .infoWindowAnchor(0.5f, 0.5f);
-                Marker m = mMap.addMarker(markerOptions);
+               // Marker m = mMap.addMarker(markerOptions);
             }
         }, 0, 1000);
     }

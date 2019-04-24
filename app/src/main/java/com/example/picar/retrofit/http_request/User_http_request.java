@@ -80,9 +80,6 @@ public class User_http_request {
         default  void getPosition(Call<Position> call, Response<Position> response){
 
         }
-        default void rideStatus(Call<Message> call, Response<Message> response){
-
-        }
 
         default void getTransit(Call<Transit> call, Response<Transit> response){
 
