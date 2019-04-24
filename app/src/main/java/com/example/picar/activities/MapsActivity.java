@@ -194,7 +194,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 setCurrentLocation(ed_location);
                 setDestinationLocation(ed_destination);
                 if(mCurrentAddress != null && mDestinationAddress != null){
-                    mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
                     mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
                     ArrayList<MarkerOptions> markers = new ArrayList<>();
                     markers.add(mCurrentMarkerOptions);
