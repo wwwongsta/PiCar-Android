@@ -35,20 +35,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         checkLogIn();
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        /**
-         * Start activity retrofit for test
-         */
-//        Intent i = new Intent(this,RetrofitActivity.class);
-//        startActivity(i);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -67,7 +59,6 @@ public class MainActivity extends AppCompatActivity
                 Intent driver = new Intent(MainActivity.this, MapsActivity.class);
                 driver.putExtra("type", "Driver");
                 startActivity(driver);
-
             }
         });
 
@@ -94,9 +85,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        //TextView test = findViewById(R.id.testUserInfo);
-        //GetUserInfo task = new GetUserInfo(this,test);
-       // task.execute((Void) null);
     }
 
     public class GetUserInfo extends AsyncTask<Void, Void, User> {
@@ -115,7 +103,6 @@ public class MainActivity extends AppCompatActivity
             List<User> users = db.userDao().getListUser();
             if (users.size() > 0)
                 user = users.get(0);
-
             return user;
         }
 
@@ -127,7 +114,6 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onCancelled() {
-
         }
     }
 
@@ -135,15 +121,12 @@ public class MainActivity extends AppCompatActivity
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         List<Address> addresses = geocoder.getFromLocationName(myLocation, 1);
         Address address = addresses.get(0);
-
         return address;
     }
 
 
     public boolean checkLogIn() {
-
         boolean stayLoggedIn = Preferences.getInstance(getBaseContext()).getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN);
-
         if (stayLoggedIn == false) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
@@ -159,28 +142,6 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

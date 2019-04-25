@@ -32,7 +32,6 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
     private UserGetListEmail mGetEmailsTask = null;
     String emailExits;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +52,6 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
                     password.setTransformationMethod(null);
                 }else{
                     password.setTransformationMethod(new PasswordTransformationMethod());
-
                 }
             }
         });
@@ -64,15 +62,11 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
             public void onClick(View v) {
                 if(confirmValues()){
 
-
-
                     mAuthTask = new UserCreateTask();
                     mAuthTask.execute();
 
                     startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                     Toast.makeText(RegisterActivity.this, "You are register",Toast.LENGTH_LONG);
-
-
 
                 }
             }
@@ -107,8 +101,6 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
             return true;
         }
     }
-
-
 
     @Override
     public void errorEmail(Call<MessageUserEmailApproval> call, Throwable t) {
