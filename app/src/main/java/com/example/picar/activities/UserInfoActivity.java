@@ -52,14 +52,12 @@ public class UserInfoActivity  extends AppCompatActivity {
 
         //Call<UserInfo> call = api.getUserByEmail(token,);
 
-        List<User> user_list = AppDatabase.getInstance(this).userDao().getListUser();
-            for(User user : user_list){
-                t_email.setText(email);
-                t_name.setText(user.getName());
-                t_first_name.setText(user.getFamily_name());
-                t_password.setText(user.getPassword());
-                t_phone.setText(user.getPhone());
-            }
+        User user = AppDatabase.getInstance(this).userDao().getUser();
+            t_email.setText(email);
+            t_name.setText(user.getName());
+            t_first_name.setText(user.getFamily_name());
+            t_password.setText(user.getPassword());
+            t_phone.setText(user.getPhone());
     }
     @Override
     public boolean onSupportNavigateUp() {
