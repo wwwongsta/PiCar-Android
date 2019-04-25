@@ -210,6 +210,9 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + getString(R.string.google_maps_key);
         return url;
 
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(new RecyclerViewAdapter(list));
     }
 
     private void setUpMarkers(MarkerOptions mCurrentMarkerOptions,MarkerOptions mDestinationMarkerOptions,

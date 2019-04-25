@@ -19,7 +19,7 @@ import com.example.picar.database.entity.UserCar;
 
 @Database(entities = {  User.class, UserCar.class,
                         Transaction.class, Transit.class, Position.class}
-                        ,version = 3, exportSchema = false)
+                        ,version = 4, exportSchema = false)
 @TypeConverters({DateTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
@@ -39,7 +39,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "Sample.db")
+                            AppDatabase.class, "sample.db")
                             .fallbackToDestructiveMigration()
                             //.addMigrations(Migration1_2.newInstance(), Migration2_3.newInstance())
                             .allowMainThreadQueries()
