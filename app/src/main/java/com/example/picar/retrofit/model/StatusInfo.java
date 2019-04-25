@@ -7,10 +7,16 @@ public class StatusInfo {
      */
     private String status;
     private String passagerId;
-
-    public StatusInfo(String status, String passagerId) {
+    private String driverID;
+    
+    public StatusInfo(String status, String passagerId,String driverID) {
         this.status = status;
         this.passagerId = passagerId;
+        this.driverID = driverID;
+    }
+
+    public String getDriverID() {
+        return driverID;
     }
 
     public String getStatus() {

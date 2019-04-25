@@ -1,11 +1,11 @@
 package com.example.picar.retrofit.model;
 
 public class PassengerID {
-    private int passagerId;
-    public PassengerID(int passagerId) {
+    private String passagerId;
+    public PassengerID(String passagerId) {
         this.passagerId = passagerId;
     }
-    public int getPassagerId() {
+    public String getPassagerId() {
         return passagerId;
     }
 }
