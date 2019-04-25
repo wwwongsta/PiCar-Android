@@ -238,10 +238,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.animateCamera(zoom);
 
                 } else {
-
                     Intent i = new Intent(MapsActivity.this, CardViewActivity.class);
                     startActivity(i);
-                }
+//                }
 
             }
         });

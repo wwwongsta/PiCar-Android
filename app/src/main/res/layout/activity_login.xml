@@ -44,6 +44,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
+                    android:text="kevin.doremy.l@gmail.com"
                     android:maxLines="1"
                     android:singleLine="true" />
 
@@ -62,6 +63,7 @@
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
+                    android:text="Qweart1"
                     android:maxLines="1"
                     android:singleLine="true" />
 
