@@ -29,6 +29,7 @@ import com.example.picar.Preferences;
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
 import com.example.picar.database.entity.Position;
+import com.example.picar.database.entity.Transit;
 import com.example.picar.database.entity.User;
 import com.example.picar.directionHelpers.FetchUrl;
 import com.example.picar.directionHelpers.TaskLoadedCallback;
@@ -123,6 +124,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button btn_location;
     Button btn_destination;
 
+    private Transit transit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -206,13 +209,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_rides.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Cree un nouveau transit
+                CreateTransitTask createTransitTask = new CreateTransitTask(user.get_id(), user.getCurrent_position_id(), user.getDestination_id());
+                createTransitTask.execute((Void) null);
 
                 //if driver
                 if (user.isDriver()) {
-                    Handler handler = new Handler();
+                    Handler handlerChangePosition = new Handler();
                     int delay = 5000; //milliseconds
 
-                    handler.postDelayed(new Runnable() {
+                    handlerChangePosition.postDelayed(new Runnable() {
                         public void run() {
                             String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
                             MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
@@ -220,7 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
                             new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
                             putPositionTask.execute((Void) null);
-                            handler.postDelayed(this, delay);
+                            handlerChangePosition.postDelayed(this, delay);
 
 
                         }
@@ -572,6 +578,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    public class CreateTransitTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        private String driverID;
+        private String driver_current_positionID;
+        private String driver_destination_positionID;
+
+        public CreateTransitTask(String driverID, String driver_current_positionID, String driver_destination_positionID) {
+            this.driverID = driverID;
+            this.driver_current_positionID = driver_current_positionID;
+            this.driver_destination_positionID = driver_destination_positionID;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+
+            DriverInfoForTransit driverInfoForTransit = new DriverInfoForTransit(driverID, driver_current_positionID, driver_destination_positionID);
+            request.api.createTransit(driverInfoForTransit);
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+        }
+
+        @Override
+        protected void onCancelled() {
+        }
+    }
+
+
+
     public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
         String idDriver;
 
@@ -594,32 +633,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public void updateMapAsyncTask() {
-        final Handler handler = new Handler();
-        Timer timer = new Timer();
-        TimerTask doAsynchronousTask = new TimerTask() {
-            @Override
-            public void run() {
-                handler.post(new Runnable() {
-                    public void run() {
-                        try {
-                            // PerformBackgroundTask this class is the class that extends AsynchTask
-                            String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
-                            MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-                            putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
-                            new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
-                            putPositionTask.execute((Void) null);
 
-
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                        }
-                    }
-                });
-            }
-        };
-        timer.schedule(doAsynchronousTask, 0, 10000); //execute in every 50000 ms
-    }
 
     public class UpdatePositionService extends Service {
         Handler handler;

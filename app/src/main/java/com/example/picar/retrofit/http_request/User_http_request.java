@@ -22,7 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class User_http_request {
     public static String TAG = "User_http_request";
-    private PiCarApi api;
+    public PiCarApi api;
     private UserHttpError errorHandler;
     private UserHttpResponse responseHandler;
     public User_http_request(Activity activity) {
