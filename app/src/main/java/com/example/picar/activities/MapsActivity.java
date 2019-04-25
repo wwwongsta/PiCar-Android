@@ -153,7 +153,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         token = Preferences.getInstance(getBaseContext()).getString("Authorization");
         if (!token.equalsIgnoreCase("")) {
             token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
@@ -231,7 +230,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 setCurrentLocation(ed_location);
                 setDestinationLocation(ed_destination);
                 if (mCurrentAddress != null && mDestinationAddress != null) {
-                    setUpMarkers(v);
+                    if(mDestinationMarkerOptions != null){
+                        mMap.clear();
+                        setCurrentLocation(ed_location);
+                        setDestinationLocation(ed_destination);
+                        setUpMarkers(v);
+                    }else{
+                        setUpMarkers(v);
+                    }
                 }
             }
         });
@@ -331,9 +337,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void setUpMarkers(View v) {
+        ArrayList<MarkerOptions> markers = new ArrayList<>();
+
         mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
         mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
-        ArrayList<MarkerOptions> markers = new ArrayList<>();
         markers.add(mCurrentMarkerOptions);
         markers.add(mDestinationMarkerOptions);
         new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
@@ -398,7 +405,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-
     }
 
     @Override
@@ -899,6 +905,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return null;
         }
     }
+<<<<<<< HEAD
 
 //    @SuppressWarnings("StatementWithEmptyBody")
 //    @Override
@@ -926,4 +933,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        return true;
 //    }
 
+=======
+>>>>>>> 20b8647568705b868e2127e8848f90ff0013e7e3
 }

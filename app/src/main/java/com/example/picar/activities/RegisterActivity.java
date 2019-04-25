@@ -37,6 +37,8 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         name = (EditText) findViewById(R.id.Name);
         phone = (EditText) findViewById(R.id.Phone);
         email = (EditText) findViewById(R.id.Email);
@@ -181,5 +183,10 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
            // Toast.makeText(this,"Invalid Email, this Email already exist",Toast.LENGTH_LONG).show();
        // }
         return result;
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }
