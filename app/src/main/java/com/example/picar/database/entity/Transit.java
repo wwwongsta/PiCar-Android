@@ -18,13 +18,13 @@ public class Transit {
     private String id;
 
 
-    @ColumnInfo(name = "driverId")
+    @ColumnInfo(name = "driverID")
     private String driverId;
 
-    @ColumnInfo(name = "driver_current_position_id")
+    @ColumnInfo(name = "driver_current_positionID")
     private String driver_current_position_id;
 
-    @ColumnInfo(name = "driver_destination_position_id")
+    @ColumnInfo(name = "driver_destination_positionID")
     private String driver_destination_position_id;
 
     @Ignore
