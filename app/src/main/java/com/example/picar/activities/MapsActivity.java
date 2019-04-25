@@ -36,6 +36,8 @@ import com.example.picar.directionHelpers.TaskLoadedCallback;
 import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.http_request.User_http_request;
 import com.example.picar.retrofit.model.DriverInfoForTransit;
+import com.example.picar.retrofit.model.type_message.MessageUserEmailApproval;
+import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -75,6 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private PutPositionTask putPositionTask = null;
     private GetTransitWithDriveID getTransitWithDriveID = null;
+    private GetTransitByDriverIdTask getTransitByDriverIdTask = null;
 //
     // private GetTransitTask getTransitTask = null
 //private String GEOFENCE_REQ_ID = "myGeofence";
@@ -103,6 +106,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MarkerOptions mCurrentMarkerOptions;
     private MarkerOptions mDestinationMarkerOptions;
 
+    private MarkerOptions passagerTempMarkerOptions;
+    private MarkerOptions passagerCurrentMarkerOptions;
+    private MarkerOptions passagerDestinationMarkerOptions;
+
     private Polyline currentPolyline;
 
     // Keys for storing activity state.
@@ -118,13 +125,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String driver_id;
     private String driver_destination;
     private String driver_currentPosition;
-    private User user;
 
     Button btn_rides;
     Button btn_location;
     Button btn_destination;
 
     private Transit transit;
+    private User user;
+    private UserInfo passager;
+
+    private boolean passagerTrouver = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,20 +225,83 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //if driver
                 if (user.isDriver()) {
+                    Handler handlerCheckPassager = new Handler();
+                    int delayCheckPassager = 5000; //milliseconds
+
+                    handlerCheckPassager.postDelayed(new Runnable() {
+                        public void run() {
+                            getTransitByDriverIdTask = new GetTransitByDriverIdTask(user.get_id());
+                            getTransitByDriverIdTask.execute((Void) null);
+
+                            if(transit.getPassager() != null){
+                                for(Transit.Passager p : transit.getPassager()){
+                                    if(p.getPassagerStatus().equalsIgnoreCase("waiting")){
+                                        handlerCheckPassager.removeCallbacks(this);
+                                        GetPassagerByIdTask getPassagerByIdTask = new GetPassagerByIdTask(p.getPassagerId());
+                                        getPassagerByIdTask.execute((Void) null);
+
+
+                                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                switch (which) {
+                                                    case DialogInterface.BUTTON_POSITIVE:
+
+
+
+                                                        passagerTrouver = true;
+                                                        GetPassagerPositionTask  getPassagerPositionTask = new GetPassagerPositionTask(passager.getUser_info().getCurrent_position_id());
+                                                        getPassagerPositionTask.execute((Void) null);
+                                                        passagerCurrentMarkerOptions = passagerTempMarkerOptions;
+                                                        mMap.addMarker(passagerCurrentMarkerOptions);
+                                                        getPassagerPositionTask = new GetPassagerPositionTask(passager.getUser_info().getDestination_id());
+                                                        getPassagerPositionTask.execute((Void) null);
+                                                        passagerDestinationMarkerOptions = passagerTempMarkerOptions;
+                                                        mMap.addMarker(passagerDestinationMarkerOptions);
+                                                        break;
+
+                                                    case DialogInterface.BUTTON_NEGATIVE:
+                                                        passagerTrouver = false;
+                                                        break;
+                                                }
+                                            }
+                                        };
+
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+                                        builder.setTitle("Confirm");
+                                        builder.setMessage("Accepter vous le passager :" + passager.getUser_info().getName());
+                                        builder.setPositiveButton("Yes", dialogClickListener);
+                                        builder.setNegativeButton("No", dialogClickListener);
+                                        builder.show();
+
+
+                                    }
+
+                                }
+                            }
+                            Toast.makeText(v.getContext(), "Test find passager", Toast.LENGTH_LONG).show();
+                            if(passagerTrouver){
+                                handlerCheckPassager.removeCallbacks(this);
+                            }else{
+                                handlerCheckPassager.postDelayed(this, delayCheckPassager);
+                            }
+
+
+                        }
+                    }, delayCheckPassager);
+
+
+
                     Handler handlerChangePosition = new Handler();
                     int delay = 5000; //milliseconds
-
                     handlerChangePosition.postDelayed(new Runnable() {
                         public void run() {
                             String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
                             MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-
                             putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
                             new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
                             putPositionTask.execute((Void) null);
                             handlerChangePosition.postDelayed(this, delay);
-
-
                         }
                     }, delay);
 
@@ -579,8 +652,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public class CreateTransitTask extends AsyncTask<Void, Void, Boolean> {
-
-
         private String driverID;
         private String driver_current_positionID;
         private String driver_destination_positionID;
@@ -593,21 +664,102 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            User_http_request request = new User_http_request(MapsActivity.this);
-
             DriverInfoForTransit driverInfoForTransit = new DriverInfoForTransit(driverID, driver_current_positionID, driver_destination_positionID);
-            request.api.createTransit(driverInfoForTransit);
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-        }
-
-        @Override
-        protected void onCancelled() {
+            Call<Transit> call = api.createTransit(driverInfoForTransit);
+//            call.enqueue(new Callback<Transit>() {
+//                @Override
+//                public void onResponse(Call<Transit> call, Response<Transit> response) {
+//                }
+//                @Override
+//                public void onFailure(Call<Transit> call, Throwable t) {
+//                }
+//            });
+            return null;
         }
     }
+
+    public class GetTransitByDriverIdTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        private String driverID;
+
+
+        public GetTransitByDriverIdTask(String driverID) {
+            this.driverID = driverID;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Call<Transit> call = api.getTransit(driverID);
+            call.enqueue(new Callback<Transit>() {
+                @Override
+                public void onResponse(Call<Transit> call, Response<Transit> response) {
+                    transit = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<Transit> call, Throwable t) {
+                }
+            });
+            return null;
+        }
+    }
+
+    public class GetPassagerPositionTask extends AsyncTask<Void, Void, Boolean> {
+        private String positionId;
+
+        public GetPassagerPositionTask(String positionId) {
+            this.positionId = positionId;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Call<Position> call = api.getPosition(token, positionId);
+            call.enqueue(new Callback<Position>() {
+                @Override
+                public void onResponse(Call<Position> call, Response<Position> response) {
+                    Position position = response.body();
+                    passagerTempMarkerOptions = new MarkerOptions().position(new LatLng(position.getLat(), position.getLng())).icon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                }
+
+                @Override
+                public void onFailure(Call<Position> call, Throwable t) {
+                }
+            });
+            return null;
+        }
+    }
+
+    public class GetPassagerByIdTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        private String passagerId;
+
+
+        public GetPassagerByIdTask(String passsagerId) {
+            this.passagerId = passsagerId;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Call<UserInfo> call = api.getUserById(passagerId);
+            call.enqueue(new Callback<UserInfo>() {
+                @Override
+                public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+                    passager = response.body();
+                }
+
+                @Override
+                public void onFailure(Call<UserInfo> call, Throwable t) {
+                }
+            });
+            return null;
+        }
+    }
+
 
 
 
