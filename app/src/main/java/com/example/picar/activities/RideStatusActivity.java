@@ -82,6 +82,7 @@ public class RideStatusActivity extends AppCompatActivity {
             passager.putExtra("driver_destination_id", driver_destination_id);
 
             startActivity(passager);
+            finish();
             my_timer.cancel();
         }
         if(STATUS.equals("refused")){
