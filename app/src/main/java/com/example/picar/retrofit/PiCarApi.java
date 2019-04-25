@@ -57,7 +57,7 @@ public interface PiCarApi {
     Call<Transit> createTransit(@Body DriverInfoForTransit transit);
 
     @PUT("transit/status")
-    Call<StatusUpdateResponse> createTransit(@Body StatusInfo status);
+    Call<StatusUpdateResponse> updateStatus(@Body StatusInfo status);
 
     @GET("transit/get/{id}")
     Call<Transit> getTransit(@Path("id") String id);
