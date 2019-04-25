@@ -53,16 +53,9 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
         list.add("one");
         list.add("two");
 
-
-
-
-
-
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new RecyclerViewAdapter(list));
-
-
 
         return view;
     }

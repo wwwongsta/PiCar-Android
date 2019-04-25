@@ -47,6 +47,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -66,8 +67,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError
-        , User_http_request.UserHttpResponse {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError, User_http_request.UserHttpResponse {
+
+
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
@@ -75,6 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private PutPositionTask putPositionTask = null;
     private GetTransitWithDriveID getTransitWithDriveID = null;
+    private GetPositionCurrent_IDPosition getPositionCurrent_idPosition = null;
 //
     // private GetTransitTask getTransitTask = null
 //private String GEOFENCE_REQ_ID = "myGeofence";
@@ -102,6 +105,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private MarkerOptions mCurrentMarkerOptions;
     private MarkerOptions mDestinationMarkerOptions;
+    private MarkerOptions mDriverCurrentmarkerOptions = new MarkerOptions(); ;
+    private Marker mDriverCurrent;
 
     private Polyline currentPolyline;
 
@@ -143,6 +148,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (intent.hasExtra("status")) {
             validated = intent.getStringExtra("status");
             driver_id = intent.getStringExtra("driver_id");
+            Log.e("DriverID","getStringExtra " + driver_id);
 
         }
 
@@ -162,13 +168,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         setContentView(R.layout.activity_maps);
 
-//        // Construct a GeoDataClient.
-//        mGeoDataClient = Places.getGeoDataClient(this);
-
-//        // Construct a PlaceDetectionClient.
-//        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
-
-        // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         getLocationPermission();
@@ -201,6 +200,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 if (ed_destination != null) {
+                    btn_destination.setEnabled(true);
                     setCurrentLocation(ed_location);
                 }
             }
@@ -252,8 +252,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ed_destination.setVisibility(View.GONE);
             ed_location.setVisibility(View.GONE);
 
+            Log.e("DriverPosition","SetVissibility Gone");
 
-            getTransitWithDriveID = new GetTransitWithDriveID(driver_id);
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    getTransitWithDriveID = new GetTransitWithDriveID("5cc0cba41b30070017e13fc2");
+                    getTransitWithDriveID.execute();
+                }
+            }, 0, 1000);
 
 
         }
@@ -590,7 +597,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             this.driver_current_positionID = driver_current_positionID;
             this.driver_destination_positionID = driver_destination_positionID;
         }
-
         @Override
         protected Boolean doInBackground(Void... params) {
             User_http_request request = new User_http_request(MapsActivity.this);
@@ -599,42 +605,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             request.api.createTransit(driverInfoForTransit);
             return true;
         }
-
         @Override
         protected void onPostExecute(final Boolean success) {
         }
-
         @Override
         protected void onCancelled() {
         }
     }
-
-
-
-    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
-        String idDriver;
-
-        GetTransitWithDriveID(String id) {
-            idDriver = id;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            User_http_request request = new User_http_request(MapsActivity.this);
-            request.getTransitforPosition(idDriver);
-            return true;
-        }
-    }
-
-    @Override
-    public void getTransitforPosition(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
-        DriverInfoForTransit mess = response.body();
-        Log.i("DriverPosition", mess.getDriver_current_positionID());
-
-    }
-
-
-
     public class UpdatePositionService extends Service {
         Handler handler;
         Runnable test;
@@ -661,5 +638,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
     }
+    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
+        String idDriver;
 
+        GetTransitWithDriveID(String id) {
+            idDriver = id;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            request.getTransitforPosition(idDriver);
+         //   Log.e("DriverPosition","doInBackground to get driver current position id");
+
+
+            return true;
+        }
+    }
+    @Override
+    public void getTransitforPosition(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
+        DriverInfoForTransit mess = response.body();
+//        Log.e("DriverPosition", " Response<DriverInfoForTransit> response ");
+//        Log.e("DriverPosition", response.message());
+//        Log.e("DriverPosition - current id", mess.getDriver_current_positionID());
+//        Log.e("DriverPosition - current destiation", mess.getDriver_destination_positionID());
+//        Log.e("DriverPosition- current driver id", mess.getDriverID());
+
+        getPositionCurrent_idPosition = new GetPositionCurrent_IDPosition( mess.getDriver_current_positionID());
+        getPositionCurrent_idPosition.execute();
+
+
+    }
+    public class GetPositionCurrent_IDPosition extends AsyncTask<Void, Void, Boolean> {
+        String iDPosition;
+
+        GetPositionCurrent_IDPosition(String idPositionDrive) {
+            iDPosition = idPositionDrive;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            request.getPosition(token,iDPosition);
+            //Log.e("DriverPosition","doInBackground to get GetPositionCurrent_IDPosition");
+            return true;
+        }
+    }
+    @Override
+    public void getPosition(Call<Position> call, Response<Position> response) {
+        Position mess = response.body();
+//        Log.e("DriverPosition", " getPosition(Call<Position> call, Response<Position> response) ");
+//        Log.e("DriverPosition", "Message : "+response.message() + "  Code : "+ response.code());
+        Log.e("DriverPosition", "Latitude: "+mess.getLat());
+        Log.e("DriverPosition", "Longitude : "+mess.getLng());
+        Log.e("DriverPosition----", mess.getUserId());
+
+
+        changeMarkerPosition( new LatLng(mess.getLat(), mess.getLng()));
+
+    }
+    public void changeMarkerPosition(LatLng latLng) {
+        mDriverCurrentmarkerOptions.position(latLng);
+        mDriverCurrentmarkerOptions.title("Current Driver Location Position");
+        mDriverCurrentmarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.fiat));
+        if(mDriverCurrent == null) {
+            mDriverCurrent = mMap.addMarker(mDriverCurrentmarkerOptions);
+        }
+        mDriverCurrent.setPosition(latLng);
+    }
 }

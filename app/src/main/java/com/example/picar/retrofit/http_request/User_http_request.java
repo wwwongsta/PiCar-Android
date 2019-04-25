@@ -58,7 +58,7 @@ public class User_http_request {
         default void errorGetPosition(Call<Position> call, Throwable t){
 
         }
-        default void getTransitforPosition(Call<DriverInfoForTransit> call, Throwable t){
+        default void errorGetTransitforPosition(Call<DriverInfoForTransit> call, Throwable t){
 
         }
 
@@ -87,6 +87,22 @@ public class User_http_request {
 
         }
     }
+    public void getPosition(String token, String idPosition){
+
+        Call<Position> call = api.getPosition(token,idPosition);
+        call.enqueue(new Callback<Position>() {
+            @Override
+            public void onResponse(Call<Position> call, Response<Position> response) {
+                responseHandler.getPosition(call,response);
+
+            }
+            @Override
+            public void onFailure(Call<Position> call, Throwable t) {
+                errorHandler.errorGetPosition(call,t);
+            }
+        });
+
+    }
 
     public void getTransitforPosition(String idDriver){
 
@@ -99,7 +115,7 @@ public class User_http_request {
             }
             @Override
             public void onFailure(Call<DriverInfoForTransit> call, Throwable t) {
-                errorHandler.getTransitforPosition(call,t);
+                errorHandler.errorGetTransitforPosition(call,t);
             }
         });
 
