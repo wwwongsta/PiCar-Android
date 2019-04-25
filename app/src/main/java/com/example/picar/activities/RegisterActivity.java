@@ -32,11 +32,12 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
     private UserGetListEmail mGetEmailsTask = null;
     String emailExits;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         name = (EditText) findViewById(R.id.Name);
         phone = (EditText) findViewById(R.id.Phone);
         email = (EditText) findViewById(R.id.Email);
@@ -51,7 +52,6 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
                     password.setTransformationMethod(null);
                 }else{
                     password.setTransformationMethod(new PasswordTransformationMethod());
-
                 }
             }
         });
@@ -62,15 +62,11 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
             public void onClick(View v) {
                 if(confirmValues()){
 
-
-
                     mAuthTask = new UserCreateTask();
                     mAuthTask.execute();
 
                     startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                     Toast.makeText(RegisterActivity.this, "You are register",Toast.LENGTH_LONG);
-
-
 
                 }
             }
@@ -105,8 +101,6 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
             return true;
         }
     }
-
-
 
     @Override
     public void errorEmail(Call<MessageUserEmailApproval> call, Throwable t) {
@@ -181,5 +175,10 @@ public class RegisterActivity extends AppCompatActivity implements User_http_req
            // Toast.makeText(this,"Invalid Email, this Email already exist",Toast.LENGTH_LONG).show();
        // }
         return result;
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }

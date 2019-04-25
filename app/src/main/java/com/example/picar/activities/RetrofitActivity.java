@@ -24,9 +24,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitActivity extends AppCompatActivity implements
         User_http_request.UserHttpResponse,
         User_http_request.UserHttpError {
+
     TextView tx;
     private PiCarApi api;
     private User_http_request request;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

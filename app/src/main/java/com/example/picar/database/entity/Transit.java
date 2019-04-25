@@ -31,6 +31,7 @@ public class Transit {
     @ColumnInfo(name = "passager")
     private List<Passager> passager;
 
+
     public Transit() {
     }
 
@@ -40,6 +41,16 @@ public class Transit {
         this.driver_current_positionID = driver_current_positionID;
         this.driver_destination_positionID = driver_destination_positionID;
         this.passager = passager;
+    }
+
+
+
+    public String getDriverID() {
+        return driverID;
+    }
+
+    public void setDriverID(String driverID) {
+        this.driverID = driverID;
     }
 
     @NonNull

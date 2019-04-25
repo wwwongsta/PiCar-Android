@@ -8,6 +8,5 @@ public class CardViewActivity extends SingleCardFragment {
     @Override
     protected Fragment createFragment() {
         return new RecyclerFragment().newInstace();
-
     }
 }
