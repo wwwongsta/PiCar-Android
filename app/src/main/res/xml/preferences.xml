@@ -2,37 +2,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--<android.support.v7.preference.EditTextPreference-->
-        <!--app:key="preference_server_address"-->
-        <!--app:title="Server Address"-->
-        <!--app:summary=""-->
-        <!--android:dialogMessage="Dialog Message"-->
-        <!--android:defaultValue="Default value"/>-->
-
-    <!--<android.support.v7.preference.EditTextPreference-->
-        <!--app:key="preference_web_app"-->
-        <!--app:title="Web app"-->
-        <!--app:summary=""-->
-        <!--android:dialogMessage="Dialog Message"-->
-        <!--android:defaultValue="Default value"/>-->
-    <!--<android.support.v7.preference.EditTextPreference-->
-        <!--app:key="preference_web_app_port"-->
-        <!--app:title="Web app port"-->
-        <!--app:summary=""-->
-        <!--android:dialogMessage="Dialog Message"-->
-        <!--android:defaultValue="Default value"/>-->
-    <!--<android.support.v7.preference.EditTextPreference-->
-        <!--app:key="preference_synchro_port"-->
-        <!--app:title="Synchro port"-->
-        <!--app:summary=""-->
-        <!--android:dialogMessage="Dialog Message"-->
-        <!--android:defaultValue="Default value"/>-->
-
-    <android.support.v7.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="preference_stay_logged_in"
-        android:title="Keep me logged in"
-        android:summary="Turn this option on or off"/>
+        android:title="Log out"
+        android:summary="Log out ( go to sign in ) "/>
+
+
     <Preference
         android:key="authorization_key"
         android:title="autorization"

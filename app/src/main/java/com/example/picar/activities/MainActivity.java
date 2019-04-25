@@ -3,12 +3,10 @@ package com.example.picar.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,10 +16,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.picar.Preferences;
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
 import com.example.picar.database.entity.User;
@@ -84,7 +82,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
         Address address;
         try {
             address = getCoordinatesOfAddress(this, "Montreal");
@@ -92,11 +89,7 @@ public class MainActivity extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
-
-
 
     @Override
     protected void onResume() {
@@ -148,13 +141,10 @@ public class MainActivity extends AppCompatActivity
 
 
     public boolean checkLogIn() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean stayLoggedIn = sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false);
 
+        boolean stayLoggedIn = Preferences.getInstance(getBaseContext()).getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN);
 
-        extras = getIntent().getExtras();
-
-        if (stayLoggedIn != true) {
+        if (stayLoggedIn == false) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         }
         return stayLoggedIn;
