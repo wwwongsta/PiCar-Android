@@ -2,11 +2,13 @@ package com.example.picar.activities;
 
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -19,6 +21,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -31,6 +34,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.picar.JSONParser;
 import com.example.picar.Preferences;
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
@@ -44,6 +48,7 @@ import com.example.picar.retrofit.http_request.User_http_request;
 import com.example.picar.retrofit.model.DriverInfoForTransit;
 import com.example.picar.retrofit.model.StatusInfo;
 import com.example.picar.retrofit.model.StatusUpdateResponse;
+import com.example.picar.retrofit.model.type_message.MessageUserEmailApproval;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -63,7 +68,13 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -87,11 +98,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private PutPositionTask putPositionTask = null;
     private GetTransitWithDriveID getTransitWithDriveID = null;
-    private GetPositionCurrent_IDPosition getPositionCurrent_idPosition = null;
     private GetTransitByDriverIdTask getTransitByDriverIdTask = null;
     private UpdateStatusToValidatedTask updateStatusToValidatedTask = null;
     private UpdateStatusToRefusedTask updateStatusToRefusedTask = null;
-    private GetPassagerPositionTask  getPassagerPositionTask = null;
+
+    private GetPassagerCurrentPositionTask getPassagerCurrentPositionTask = null;
+    private GetPassagerDestinationPositionTask getPassagerDestinationPositionTask = null;
 
 //
     // private GetTransitTask getTransitTask = null
@@ -127,6 +139,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MarkerOptions passagerCurrentMarkerOptions;
     private MarkerOptions passagerDestinationMarkerOptions;
 
+    private MarkerOptions passagerTempMarkerOptions;
+    private MarkerOptions passagerCurrentMarkerOptions;
+    private MarkerOptions passagerDestinationMarkerOptions;
+
     private Polyline currentPolyline;
 
     // Keys for storing activity state.
@@ -136,7 +152,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     EditText locationSearch;
 
     private PiCarApi api;
-
+    Context context;
     private String TYPE;
     private String validated = "";
     private String driver_id;
@@ -152,11 +168,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private UserInfo passager;
 
     private boolean passagerTrouver = false;
-
+    ArrayList<LatLng> waypoints = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        context = this;
         token = Preferences.getInstance(getBaseContext()).getString("Authorization");
         if (!token.equalsIgnoreCase("")) {
             token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
@@ -260,12 +277,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 //if driver
                 if (user.isDriver()) {
                     Handler handlerCheckPassager = new Handler();
+
                     int delayCheckPassager = 5000; //milliseconds
 
                     handlerCheckPassager.postDelayed(new Runnable() {
                         public void run() {
                             getTransitByDriverIdTask = new GetTransitByDriverIdTask(user.get_id());
                             getTransitByDriverIdTask.execute((Void) null);
+                            handlerCheckPassager.removeCallbacks(this);
 
                             if(transit != null && transit.getPassager() != null){
                                 for(Transit.Passager p : transit.getPassager()){
@@ -297,9 +316,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     handlerChangePosition.postDelayed(new Runnable() {
                         public void run() {
                             String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
-                            MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-                            putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
-                            new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+                            mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                            putPositionTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
+                            //drawRoute(waypoints,"driving", false, true);
+                            //new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+
                             putPositionTask.execute((Void) null);
                             handlerChangePosition.postDelayed(this, delay);
                         }
@@ -349,7 +370,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
         markers.add(mCurrentMarkerOptions);
         markers.add(mDestinationMarkerOptions);
-        new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+        //new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
 
 
         //show all marker on the map
@@ -661,30 +682,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public class UpdateStatusToValidatedTask extends AsyncTask<Void, Void, Boolean> {
 
 
+
         private String passagerId;
         //        private final String mPosition;
         private String status;
+        private String driverID;
 
-        UpdateStatusToValidatedTask(String passagerId) {
+        UpdateStatusToValidatedTask(String passagerId, String driverID) {
             this.passagerId = passagerId;
-            this.status = "validated";
+            this.status = "Validated";
+            this.driverID = driverID;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            StatusInfo statusInfo = new StatusInfo(passagerId, status);
-            Call<StatusUpdateResponse> call = api.createTransit(statusInfo);
-            call.enqueue(new Callback<StatusUpdateResponse>() {
+            StatusInfo statusInfo = new StatusInfo(passagerId, status, driverID);
+            Call<Transit> call = api.updateStatus(statusInfo);
+            call.enqueue(new Callback<Transit>() {
                 @Override
-                public void onResponse(Call<StatusUpdateResponse> call, Response<StatusUpdateResponse> response) {
-                    getPassagerPositionTask = new GetPassagerPositionTask(passager.getUser_info().getCurrent_position_id());
-                    getPassagerPositionTask.execute((Void) null);
-                    getPassagerPositionTask = new GetPassagerPositionTask(passager.getUser_info().getDestination_id());
-                    getPassagerPositionTask.execute((Void) null);
+                public void onResponse(Call<Transit> call, Response<Transit> response) {
+                    getPassagerCurrentPositionTask = new GetPassagerCurrentPositionTask(passager.getUser_info().getCurrent_position_id());
+                    getPassagerCurrentPositionTask.execute((Void) null);
+                    getPassagerDestinationPositionTask = new GetPassagerDestinationPositionTask(passager.getUser_info().getDestination_id());
+                    getPassagerDestinationPositionTask.execute((Void) null);
                 }
 
                 @Override
-                public void onFailure(Call<StatusUpdateResponse> call, Throwable t) {
+                public void onFailure(Call<Transit> call, Throwable t) {
                 }
             });
             return null;
@@ -696,29 +720,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         private String passagerId;
         //        private final String mPosition;
         private String status;
+        private String driverID;
 
-        UpdateStatusToRefusedTask(String passagerId) {
+        UpdateStatusToRefusedTask(String passagerId, String driverID) {
             this.passagerId = passagerId;
             this.status = "refused";
+            this.driverID = driverID;
         }
+
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            StatusInfo statusInfo = new StatusInfo(passagerId, status);
-            Call<StatusUpdateResponse> call = api.createTransit(statusInfo);
-            call.enqueue(new Callback<StatusUpdateResponse>() {
+            StatusInfo statusInfo = new StatusInfo(passagerId, status, driverID);
+            Call<Transit> call = api.updateStatus(statusInfo);
+            call.enqueue(new Callback<Transit>() {
                 @Override
-                public void onResponse(Call<StatusUpdateResponse> call, Response<StatusUpdateResponse> response) {
-                    getPassagerPositionTask = new GetPassagerPositionTask(passager.getUser_info().getCurrent_position_id());
-                    getPassagerPositionTask.execute((Void) null);
+                public void onResponse(Call<Transit> call, Response<Transit> response) {
+                    
                 }
                 @Override
-                public void onFailure(Call<StatusUpdateResponse> call, Throwable t) {
+                public void onFailure(Call<Transit> call, Throwable t) {
                 }
             });
             return null;
         }
     }
+
+
 
     public class CreateTransitTask extends AsyncTask<Void, Void, Boolean> {
         private String driverID;
@@ -743,6 +771,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                }
 //            });
             return null;
+
         }
     }
 
@@ -756,6 +785,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             this.driverID = driverID;
 
         }
+    }
+
         @Override
         protected Boolean doInBackground(Void... params) {
             Call<Transit> call = api.getTransit(driverID);
@@ -772,6 +803,127 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return null;
         }
     }
+
+    public class GetPassagerCurrentPositionTask extends AsyncTask<Void, Void, Boolean> {
+        private String positionId;
+
+        public GetPassagerCurrentPositionTask(String positionId) {
+            this.positionId = positionId;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Call<Position> call = api.getPosition(token, positionId);
+            call.enqueue(new Callback<Position>() {
+                @Override
+                public void onResponse(Call<Position> call, Response<Position> response) {
+                    Position position = response.body();
+                    passagerCurrentMarkerOptions = new MarkerOptions().position(new LatLng(position.getLat(), position.getLng())).icon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    mMap.addMarker(passagerCurrentMarkerOptions);
+                }
+
+                @Override
+                public void onFailure(Call<Position> call, Throwable t) {
+                }
+            });
+            return null;
+        }
+
+    }
+
+    public class GetPassagerDestinationPositionTask extends AsyncTask<Void, Void, Boolean> {
+        private String positionId;
+
+        public GetPassagerDestinationPositionTask(String positionId) {
+            this.positionId = positionId;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Call<Position> call = api.getPosition(token, positionId);
+            call.enqueue(new Callback<Position>() {
+                @Override
+                public void onResponse(Call<Position> call, Response<Position> response) {
+                    Position position = response.body();
+                    passagerDestinationMarkerOptions = new MarkerOptions().position(new LatLng(position.getLat(), position.getLng())).icon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    mMap.addMarker(passagerDestinationMarkerOptions);
+
+                    waypoints = new ArrayList<LatLng>();
+                    waypoints.add(new LatLng(mCurrentMarkerOptions.getPosition().latitude, mCurrentMarkerOptions.getPosition().longitude));
+                    waypoints.add(new LatLng(passagerCurrentMarkerOptions.getPosition().latitude, passagerCurrentMarkerOptions.getPosition().longitude));
+                    waypoints.add(new LatLng(passagerDestinationMarkerOptions.getPosition().latitude, passagerDestinationMarkerOptions.getPosition().longitude));
+                    waypoints.add(new LatLng(mDestinationMarkerOptions.getPosition().latitude, mDestinationMarkerOptions.getPosition().longitude));
+
+                    drawRoute(waypoints,"driving", false, true);
+                }
+
+                @Override
+                public void onFailure(Call<Position> call, Throwable t) {
+                }
+            });
+            return null;
+        }
+
+    }
+
+    public class GetPassagerByIdTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        private String passagerId;
+
+
+        public GetPassagerByIdTask(String passsagerId) {
+            this.passagerId = passsagerId;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Call<UserInfo> call = api.getUserById(passagerId);
+            call.enqueue(new Callback<UserInfo>() {
+                @Override
+                public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+                    passager = response.body();
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    updateStatusToValidatedTask = new UpdateStatusToValidatedTask(passager.getUser_info().get_id(), user.get_id());
+                                    updateStatusToValidatedTask.execute((Void) null);
+
+
+
+                                    passagerTrouver = true;
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    updateStatusToRefusedTask = new UpdateStatusToRefusedTask(passager.getUser_info().get_id(), user.get_id());
+                                    updateStatusToRefusedTask.execute((Void) null);
+                                    passagerTrouver = false;
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+                    builder.setTitle("Confirm");
+//                    builder.setMessage("Accepter vous le passager : " );
+                                        builder.setMessage("Accepter vous le passager :" + passager.getUser_info().getName());
+                    builder.setPositiveButton("Yes", dialogClickListener);
+                    builder.setNegativeButton("No", dialogClickListener);
+                    builder.show();
+                }
+
+                @Override
+                public void onFailure(Call<UserInfo> call, Throwable t) {
+                }
+            });
+            return null;
+        }
+
 
     public class GetPassagerPositionTask extends AsyncTask<Void, Void, Boolean> {
         private String positionId;
@@ -811,7 +963,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
                     MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
                     putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
-                    new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+                    //new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
                     putPositionTask.execute((Void) null);
                     handler.postDelayed(test, 4000);
                 }
@@ -978,5 +1130,210 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        drawer.closeDrawer(GravityCompat.START);
 //        return true;
 //    }
+
+    public boolean drawRoute(ArrayList<LatLng> points, String mode, boolean withIndications, boolean optimize)
+    {
+//        mMap = map;
+//        context = c;
+//        lang = language;
+
+        String url = makeURL(points,mode,optimize);
+        new connectAsyncTask(url,withIndications).execute();
+        return true;
+
+
+
+    }
+
+    private String makeURL (ArrayList<LatLng> points, String mode, boolean optimize){
+        StringBuilder urlString = new StringBuilder();
+
+        if(mode == null)
+            mode = "driving";
+
+        urlString.append("https://maps.googleapis.com/maps/api/directions/json");
+        urlString.append("?origin=");// from
+        urlString.append( points.get(0).latitude);
+        urlString.append(',');
+        urlString.append(points.get(0).longitude);
+        urlString.append("&destination=");
+        urlString.append(points.get(3).latitude);
+        urlString.append(',');
+        urlString.append(points.get(3).longitude);
+
+        urlString.append("&waypoints=");
+        if(optimize)
+            urlString.append("optimize:true|");
+        urlString.append( points.get(1).latitude);
+        urlString.append(',');
+        urlString.append(points.get(1).longitude);
+
+        for(int i=2;i<points.size()-1;i++)
+        {
+            urlString.append('|');
+            urlString.append( points.get(i).latitude);
+            urlString.append(',');
+            urlString.append(points.get(i).longitude);
+        }
+
+
+        urlString.append("&sensor=true&mode="+mode);
+        urlString.append("&key=" + getString(R.string.google_maps_key));
+
+
+        return urlString.toString();
+    }
+
+
+
+    private List<LatLng> decodePoly(String encoded) {
+
+        List<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng( (((double) lat / 1E5)),
+                    (((double) lng / 1E5) ));
+            poly.add(p);
+        }
+
+        return poly;
+    }
+
+
+
+
+    private class connectAsyncTask extends AsyncTask<Void, Void, String>{
+        private ProgressDialog progressDialog;
+        String url;
+        boolean steps;
+        connectAsyncTask(String urlPass, boolean withSteps){
+            url = urlPass;
+            steps = withSteps;
+
+        }
+        @Override
+        protected void onPreExecute() {
+            // TODO Auto-generated method stub
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage("Fetching route, Please wait...");
+            progressDialog.setIndeterminate(true);
+            progressDialog.show();
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            JSONParser jParser = new JSONParser();
+            String json = jParser.getJSONFromUrl(url);
+            return json;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.hide();
+            if(result!=null){
+                drawPath(result,steps);
+            }
+        }
+    }
+
+    private void drawPath(String  result, boolean withSteps) {
+
+        try {
+            //Tranform the string into a json object
+            final JSONObject json = new JSONObject(result);
+            JSONArray routeArray = json.getJSONArray("routes");
+            JSONObject routes = routeArray.getJSONObject(0);
+            JSONObject overviewPolylines = routes.getJSONObject("overview_polyline");
+            String encodedString = overviewPolylines.getString("points");
+            List<LatLng> list = decodePoly(encodedString);
+
+            for(int z = 0; z<list.size()-1;z++){
+                LatLng src= list.get(z);
+                LatLng dest= list.get(z+1);
+                Polyline line = mMap.addPolyline(new PolylineOptions()
+                        .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude,   dest.longitude))
+                        .width(4)
+                        .color(Color.BLUE).geodesic(true));
+            }
+
+
+            if(withSteps)
+            {
+                JSONArray arrayLegs = routes.getJSONArray("legs");
+                JSONObject legs = arrayLegs.getJSONObject(0);
+                JSONArray stepsArray = legs.getJSONArray("steps");
+                //put initial point
+
+                for(int i=0;i<stepsArray.length();i++)
+                {
+                    Step step = new Step(stepsArray.getJSONObject(i));
+                    mMap.addMarker(new MarkerOptions()
+                            .position(step.location)
+                            .title(step.distance)
+                            .snippet(step.instructions)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+                }
+            }
+
+        }
+        catch (JSONException e) {
+
+        }
+    }
+
+
+    /**
+     * Class that represent every step of the directions. It store distance, location and instructions
+     */
+    private class Step
+    {
+        public String distance;
+        public LatLng location;
+        public String instructions;
+
+        Step(JSONObject stepJSON)
+        {
+            JSONObject startLocation;
+            try {
+
+                distance = stepJSON.getJSONObject("distance").getString("text");
+                startLocation = stepJSON.getJSONObject("start_location");
+                location = new LatLng(startLocation.getDouble("lat"),startLocation.getDouble("lng"));
+                try {
+                    instructions = URLDecoder.decode(Html.fromHtml(stepJSON.getString("html_instructions")).toString(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                };
+
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 }
