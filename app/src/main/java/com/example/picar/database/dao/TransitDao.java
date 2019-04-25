@@ -32,7 +32,7 @@ public interface TransitDao {
     @Query("SELECT * from transits")
     List<Transit> getListTransit();
 
-    @Query("SELECT * FROM transits WHERE driverId LIKE :id LIMIT 1")
+    @Query("SELECT * FROM transits WHERE driverID LIKE :id LIMIT 1")
     Transit get_Transits_ByDriver_id(int id);
 
 }

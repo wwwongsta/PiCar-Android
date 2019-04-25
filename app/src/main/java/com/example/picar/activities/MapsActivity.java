@@ -207,35 +207,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
 
-                //if driver
-                if (user.isDriver()) {
-                    Handler handler = new Handler();
-                    int delay = 5000; //milliseconds
-
-                    handler.postDelayed(new Runnable() {
-                        public void run() {
-                            String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
-                            MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-
-                            putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
-                            new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
-                            putPositionTask.execute((Void) null);
-                            handler.postDelayed(this, delay);
-
-
-                        }
-                    }, delay);
-
-                    CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-                    CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-                    mMap.moveCamera(center);
-                    mMap.animateCamera(zoom);
-
-                } else {
+//                //if driver
+//                if (user.isDriver()) {
+//                    Handler handler = new Handler();
+//                    int delay = 5000; //milliseconds
+//
+//                    handler.postDelayed(new Runnable() {
+//                        public void run() {
+//                            String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
+//                            MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+//
+//                            putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
+//                            new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+//                            putPositionTask.execute((Void) null);
+//                            handler.postDelayed(this, delay);
+//
+//
+//                        }
+//                    }, delay);
+//
+//                    CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+//                    CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+//                    mMap.moveCamera(center);
+//                    mMap.animateCamera(zoom);
+//
+//                } else {
 
                     Intent i = new Intent(MapsActivity.this, CardViewActivity.class);
                     startActivity(i);
-                }
+//                }
 
             }
         });

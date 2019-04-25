@@ -53,7 +53,7 @@ public interface PiCarApi {
     @GET("position/{id}")
     Call<Position> getPosition(@Header("authorization") String token,@Path("id") String id);
 
-    @POST("/transit/add")
+    @POST("transit/add")
     Call<Transit> createTransit(@Body DriverInfoForTransit transit);
 
     @PUT("transit/status")
@@ -65,15 +65,15 @@ public interface PiCarApi {
     @GET("transit/get/{id}")
     Call<DriverInfoForTransit> getTransitforPosition(@Path("id") String id);
 
-    @POST("/transit/passager/add/{id}")
+    @POST("transit/passager/add/{id}")
     Call<Transit> addPassager(@Path("id") String idDriver, @Body PassengerID passageId);
 
-    @POST("/transit/passager/del/{id}")
+    @POST("transit/passager/del/{id}")
     Call<StatusUpdateResponse> delPassager(@Path("id") String idDriver, @Body PassengerID passageId);
 
     @GET("user/byId/{id}")
     Call<UserInfo> getUserById(@Path("id") String idUser);
 
-    @POST("/transit/calculate")
+    @POST("transit/calculate")
     Call<List<DriverId>> getNearByDriver(@Body PositionDestination posDest);
 }

@@ -5,13 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.picar.R;
-import com.example.picar.database.AppDatabase;
 import com.example.picar.database.entity.Transit;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.model.StatusUpdateResponse;
 
 import java.util.List;
 import java.util.Timer;
@@ -51,9 +48,9 @@ public class RideStatusActivity extends AppCompatActivity {
             public void onResponse(Call<Transit> call, Response<Transit> response) {
                 Transit transits = response.body();
                 List<Transit.Passager> passager = transits.getPassager();
-                driver_id = transits.getDriverId();
-                driver_location_id = transits.getDriver_current_position_id();
-                driver_destination_id = transits.getDriver_destination_position_id();
+                driver_id = transits.getDriverID();
+                driver_location_id = transits.getDriver_current_positionID();
+                driver_destination_id = transits.getDriver_destination_positionID();
                 for(Transit.Passager p : passager){
                     if(p.getPassagerId().equals("5cc0cba41b30070017e13fc2")){
                         STATUS += p.getPassagerStatus();
