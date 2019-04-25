@@ -6,13 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.picar.R;
-import com.example.picar.database.AppDatabase;
 import com.example.picar.database.entity.Transit;
 import com.example.picar.retrofit.PiCarApi;
-import com.example.picar.retrofit.model.StatusUpdateResponse;
 
 import java.util.List;
 import java.util.Timer;
@@ -88,6 +85,7 @@ public class RideStatusActivity extends AppCompatActivity {
             passager.putExtra("driver_destination_id", driver_destination_id);
 
             startActivity(passager);
+            finish();
             my_timer.cancel();
         }
         if(STATUS.equals("refused")){

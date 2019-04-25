@@ -35,10 +35,10 @@ public class Transit {
     public Transit() {
     }
 
-    public Transit(@NonNull String id, String driverId, String driver_current_position_id, String driver_destination_positionID, List<Passager> passager) {
+    public Transit(@NonNull String id, String driverID, String driver_current_positionID, String driver_destination_positionID, List<Passager> passager) {
         this.id = id;
-        this.driverID = driverId;
-        this.driver_current_positionID = driver_current_position_id;
+        this.driverID = driverID;
+        this.driver_current_positionID = driver_current_positionID;
         this.driver_destination_positionID = driver_destination_positionID;
         this.passager = passager;
     }
@@ -62,6 +62,13 @@ public class Transit {
         this.id = id;
     }
 
+    public String getDriverID() {
+        return driverID;
+    }
+
+    public void setDriverID(String driverID) {
+        this.driverID = driverID;
+    }
 
     public String getDriver_current_positionID() {
         return driver_current_positionID;

@@ -42,7 +42,8 @@
 
         <activity
             android:name=".activities.MapsActivity"
-            android:label="@string/title_activity_maps" /> <!-- <activity -->
+            android:label="@string/title_activity_maps"
+            android:theme="@style/AppTheme.NoActionBar"/> <!-- <activity -->
         <!-- android:name=".activities.CardViewActivity" -->
         <!-- android:label="@string/title_activity_card_view" /> -->
         <activity
@@ -87,6 +88,9 @@
             android:exported="true"></activity>
         <activity
             android:name=".activities.AboutActivity"
+            android:exported="true"></activity>
+        <activity
+            android:name=".activities.UserInfoActivity"
             android:exported="true"></activity>
     </application>
 
