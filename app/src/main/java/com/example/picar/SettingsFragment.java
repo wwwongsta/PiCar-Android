@@ -21,9 +21,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getContext());
-
         SharedPreferences.Editor prefsEditor = SP.edit();
-        prefsEditor.putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, Preferences.getInstance(getContext()).getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN));
+        prefsEditor.putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN,false);
         prefsEditor.apply();
 
         Preference myPref = (Preference) findPreference(SettingsActivity.KEY_PREF_STAY_LOGGED_IN);
