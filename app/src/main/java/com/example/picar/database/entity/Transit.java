@@ -27,6 +27,7 @@ public class Transit {
     @ColumnInfo(name = "driver_destination_positionID")
     private String driver_destination_positionID;
 
+
     @Ignore
     @ColumnInfo(name = "passager")
     private List<Passager> passager;

@@ -39,5 +39,6 @@
     <string name="SignIn">Sign In</string>
     <string name="title_register">Register</string>
     <string name="title_ride_status">Waiting Response</string>
+    <string name="title_activity_slash">SlashActivity</string>
 
 </resources>

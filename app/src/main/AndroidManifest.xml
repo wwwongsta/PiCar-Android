@@ -12,8 +12,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
@@ -22,10 +21,18 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <!--<activity android:name=".activities.RetrofitActivity" />-->
-        <uses-library android:name="org.apache.http.legacy"
-            android:required="false"/>
+        android:theme="@style/AppTheme"
+        >
+        <activity
+            android:name=".activities.MainActivity"
+            android:label="PiCar"
+            android:theme="@style/AppTheme.NoActionBar"
+            ></activity>
+        <!-- <activity android:name=".activities.RetrofitActivity" /> -->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -35,19 +42,20 @@
 
         <activity
             android:name=".activities.MapsActivity"
-            android:label="@string/title_activity_maps" />
-        <!--<activity-->
-            <!--android:name=".activities.CardViewActivity"-->
-            <!--android:label="@string/title_activity_card_view" />-->
+            android:label="@string/title_activity_maps" /> <!-- <activity -->
+        <!-- android:name=".activities.CardViewActivity" -->
+        <!-- android:label="@string/title_activity_card_view" /> -->
         <activity
             android:name=".activities.CardViewActivity"
             android:label="@string/title_activity_card_view" />
         <activity
             android:name=".activities.RegisterActivity"
-            android:label="@string/title_register" />
+            android:label="@string/title_register"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
         <activity
             android:name=".activities.LoginActivity"
-            android:label="@string/title_activity_login" />
+            android:label="@string/title_activity_login"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
         <activity
             android:name=".activities.RetrofitActivity"
             android:label="@string/title_activity_maps" />
@@ -63,21 +71,22 @@
             android:name=".activities.RideStatusActivity"
             android:label="@string/title_ride_status" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".SplashActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.HelpActivity"
-            android:exported="true">
-        </activity>
-        <activity android:name=".activities.AboutActivity"
-            android:exported="true">
-        </activity>
+        <activity
+            android:name=".activities.HelpActivity"
+            android:exported="true"></activity>
+        <activity
+            android:name=".activities.AboutActivity"
+            android:exported="true"></activity>
     </application>
 
 </manifest>
