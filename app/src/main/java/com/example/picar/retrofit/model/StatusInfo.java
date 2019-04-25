@@ -14,6 +14,9 @@ public class StatusInfo {
         this.passagerId = passagerId;
         this.driverID = driverID;
     }
+    public String getDriverID() {
+        return driverID;
+    }
 
     public String getStatus() {
         return status;

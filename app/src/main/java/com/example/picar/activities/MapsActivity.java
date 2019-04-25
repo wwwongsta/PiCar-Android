@@ -17,10 +17,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.text.Html;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +61,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -80,8 +87,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError
-        , User_http_request.UserHttpResponse {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError
+        , User_http_request.UserHttpResponse
+//        ,NavigationView.OnNavigationItemSelectedListener
+{
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
@@ -123,6 +132,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private MarkerOptions mCurrentMarkerOptions;
     private MarkerOptions mDestinationMarkerOptions;
+    private MarkerOptions mDriverCurrentmarkerOptions = new MarkerOptions(); ;
+    private Marker mDriverCurrent;
+
+    private MarkerOptions passagerTempMarkerOptions;
+    private MarkerOptions passagerCurrentMarkerOptions;
+    private MarkerOptions passagerDestinationMarkerOptions;
 
     private MarkerOptions passagerTempMarkerOptions;
     private MarkerOptions passagerCurrentMarkerOptions;
@@ -154,14 +169,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private boolean passagerTrouver = false;
     ArrayList<LatLng> waypoints = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         context = this;
-
-
         token = Preferences.getInstance(getBaseContext()).getString("Authorization");
         if (!token.equalsIgnoreCase("")) {
             token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
@@ -174,6 +186,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (intent.hasExtra("status")) {
             validated = intent.getStringExtra("status");
             driver_id = intent.getStringExtra("driver_id");
+            Log.e("DriverID","getStringExtra " + driver_id);
 
         }
 
@@ -192,14 +205,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         setContentView(R.layout.activity_maps);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+        /**
+         * Start activity retrofit for test
+         */
+//        Intent i = new Intent(this,RetrofitActivity.class);
+//        startActivity(i);
 
-//        // Construct a GeoDataClient.
-//        mGeoDataClient = Places.getGeoDataClient(this);
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.addDrawerListener(toggle);
+//        toggle.syncState();
+//
+//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        navigationView.setNavigationItemSelectedListener(this);
 
-//        // Construct a PlaceDetectionClient.
-//        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
-
-        // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         getLocationPermission();
@@ -223,7 +245,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 setCurrentLocation(ed_location);
                 setDestinationLocation(ed_destination);
                 if (mCurrentAddress != null && mDestinationAddress != null) {
-                    setUpMarkers(v);
+                    if(mDestinationMarkerOptions != null){
+                        mMap.clear();
+                        setCurrentLocation(ed_location);
+                        setDestinationLocation(ed_destination);
+                        setUpMarkers(v);
+                    }else{
+                        setUpMarkers(v);
+                    }
                 }
             }
         });
@@ -232,6 +261,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 if (ed_destination != null) {
+                    btn_destination.setEnabled(true);
                     setCurrentLocation(ed_location);
                 }
             }
@@ -247,13 +277,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //if driver
                 if (user.isDriver()) {
                     Handler handlerCheckPassager = new Handler();
-                    int delayCheckPassager = 1000; //milliseconds
+
+                    int delayCheckPassager = 5000; //milliseconds
 
                     handlerCheckPassager.postDelayed(new Runnable() {
                         public void run() {
                             getTransitByDriverIdTask = new GetTransitByDriverIdTask(user.get_id());
                             getTransitByDriverIdTask.execute((Void) null);
                             handlerCheckPassager.removeCallbacks(this);
+
                             if(transit != null && transit.getPassager() != null){
                                 for(Transit.Passager p : transit.getPassager()){
                                     if(p.getPassagerStatus().equalsIgnoreCase("waiting")){
@@ -288,6 +320,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             putPositionTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
                             //drawRoute(waypoints,"driving", false, true);
                             //new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+
                             putPositionTask.execute((Void) null);
                             handlerChangePosition.postDelayed(this, delay);
                         }
@@ -313,8 +346,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ed_destination.setVisibility(View.GONE);
             ed_location.setVisibility(View.GONE);
 
+            Log.e("DriverPosition","SetVissibility Gone");
 
-            getTransitWithDriveID = new GetTransitWithDriveID(driver_id);
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    getTransitWithDriveID = new GetTransitWithDriveID("5cc0cba41b30070017e13fc2");
+                    getTransitWithDriveID.execute();
+                }
+            }, 0, 1000);
 
 
         }
@@ -324,9 +364,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setUpMarkers(View v) {
+        ArrayList<MarkerOptions> markers = new ArrayList<>();
+
         mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
         mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
-        ArrayList<MarkerOptions> markers = new ArrayList<>();
         markers.add(mCurrentMarkerOptions);
         markers.add(mDestinationMarkerOptions);
         //new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
@@ -391,7 +432,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
-
     }
 
     @Override
@@ -642,6 +682,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public class UpdateStatusToValidatedTask extends AsyncTask<Void, Void, Boolean> {
 
 
+
         private String passagerId;
         //        private final String mPosition;
         private String status;
@@ -687,6 +728,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             this.driverID = driverID;
         }
 
+
         @Override
         protected Boolean doInBackground(Void... params) {
             StatusInfo statusInfo = new StatusInfo(passagerId, status, driverID);
@@ -694,8 +736,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             call.enqueue(new Callback<Transit>() {
                 @Override
                 public void onResponse(Call<Transit> call, Response<Transit> response) {
-                    getPassagerDestinationPositionTask = new GetPassagerDestinationPositionTask(passager.getUser_info().getCurrent_position_id());
-                    getPassagerDestinationPositionTask.execute((Void) null);
+                    
                 }
                 @Override
                 public void onFailure(Call<Transit> call, Throwable t) {
@@ -704,6 +745,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
     }
+
+
 
     public class CreateTransitTask extends AsyncTask<Void, Void, Boolean> {
         private String driverID;
@@ -715,7 +758,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             this.driver_current_positionID = driver_current_positionID;
             this.driver_destination_positionID = driver_destination_positionID;
         }
-
         @Override
         protected Boolean doInBackground(Void... params) {
             DriverInfoForTransit driverInfoForTransit = new DriverInfoForTransit(driverID, driver_current_positionID, driver_destination_positionID);
@@ -729,6 +771,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                }
 //            });
             return null;
+
         }
     }
 
@@ -742,6 +785,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             this.driverID = driverID;
 
         }
+    }
 
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -880,32 +924,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
 
-    }
 
-    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
-        String idDriver;
+    public class GetPassagerPositionTask extends AsyncTask<Void, Void, Boolean> {
+        private String positionId;
 
-        GetTransitWithDriveID(String id) {
-            idDriver = id;
+        public GetPassagerPositionTask(String positionId) {
+            this.positionId = positionId;
         }
-
         @Override
         protected Boolean doInBackground(Void... params) {
-            User_http_request request = new User_http_request(MapsActivity.this);
-            request.getTransitforPosition(idDriver);
-            return true;
+            Call<Position> call = api.getPosition(token, positionId);
+            call.enqueue(new Callback<Position>() {
+                @Override
+                public void onResponse(Call<Position> call, Response<Position> response) {
+                    Position position = response.body();
+                    passagerTempMarkerOptions = new MarkerOptions().position(new LatLng(position.getLat(), position.getLng())).icon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    mMap.addMarker(passagerTempMarkerOptions);
+                }
+
+                @Override
+                public void onFailure(Call<Position> call, Throwable t) {
+                }
+            });
+            return null;
         }
-    }
-
-    @Override
-    public void getTransitforPosition(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
-        DriverInfoForTransit mess = response.body();
-        Log.i("DriverPosition", mess.getDriver_current_positionID());
 
     }
-
-
-
     public class UpdatePositionService extends Service {
         Handler handler;
         Runnable test;
@@ -926,12 +971,165 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             handler.postDelayed(test, 0);
         }
+    public class GetPassagerByIdTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        private String passagerId;
+
+
+        public GetPassagerByIdTask(String passsagerId) {
+            this.passagerId = passsagerId;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Call<UserInfo> call = api.getUserById(passagerId);
+            call.enqueue(new Callback<UserInfo>() {
+                @Override
+                public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+                    passager = response.body();
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    updateStatusToValidatedTask = new UpdateStatusToValidatedTask(passager.getUser_info().get_id());
+                                    updateStatusToValidatedTask.execute((Void) null);
+
+
+
+                                    passagerTrouver = true;
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    updateStatusToRefusedTask = new UpdateStatusToRefusedTask(passager.getUser_info().get_id());
+                                    updateStatusToRefusedTask.execute((Void) null);
+                                    passagerTrouver = false;
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+                    builder.setTitle("Confirm");
+//                    builder.setMessage("Accepter vous le passager : " );
+                    builder.setMessage("Accepter vous le passager :" + passager.getUser_info().getName());
+                    builder.setPositiveButton("Yes", dialogClickListener);
+                    builder.setNegativeButton("No", dialogClickListener);
+                    builder.show();
+                }
+
+                @Override
+                public void onFailure(Call<UserInfo> call, Throwable t) {
+                }
+            });
+            return null;
+        }
+
+    }
 
         @Override
         public IBinder onBind(Intent intent) {
             return null;
         }
     }
+    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
+        String idDriver;
+
+        GetTransitWithDriveID(String id) {
+            idDriver = id;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            request.getTransitforPosition(idDriver);
+         //   Log.e("DriverPosition","doInBackground to get driver current position id");
+
+
+            return true;
+        }
+    }
+    @Override
+    public void getTransitforPosition(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
+        DriverInfoForTransit mess = response.body();
+//        Log.e("DriverPosition", " Response<DriverInfoForTransit> response ");
+//        Log.e("DriverPosition", response.message());
+//        Log.e("DriverPosition - current id", mess.getDriver_current_positionID());
+//        Log.e("DriverPosition - current destiation", mess.getDriver_destination_positionID());
+//        Log.e("DriverPosition- current driver id", mess.getDriverID());
+
+        getPositionCurrent_idPosition = new GetPositionCurrent_IDPosition( mess.getDriver_current_positionID());
+        getPositionCurrent_idPosition.execute();
+
+
+    }
+    public class GetPositionCurrent_IDPosition extends AsyncTask<Void, Void, Boolean> {
+        String iDPosition;
+
+        GetPositionCurrent_IDPosition(String idPositionDrive) {
+            iDPosition = idPositionDrive;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            request.getPosition(token,iDPosition);
+            //Log.e("DriverPosition","doInBackground to get GetPositionCurrent_IDPosition");
+            return true;
+        }
+    }
+
+    @Override
+    public void getPosition(Call<Position> call, Response<Position> response) {
+        Position mess = response.body();
+//        Log.e("DriverPosition", " getPosition(Call<Position> call, Response<Position> response) ");
+//        Log.e("DriverPosition", "Message : "+response.message() + "  Code : "+ response.code());
+        Log.e("DriverPosition", "Latitude: "+mess.getLat());
+        Log.e("DriverPosition", "Longitude : "+mess.getLng());
+        Log.e("DriverPosition----", mess.getUserId());
+
+
+        changeMarkerPosition( new LatLng(mess.getLat(), mess.getLng()));
+
+    }
+    public void changeMarkerPosition(LatLng latLng) {
+        mDriverCurrentmarkerOptions.position(latLng);
+        mDriverCurrentmarkerOptions.title("Current Driver Location Position");
+        mDriverCurrentmarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.fiat));
+        if(mDriverCurrent == null) {
+            mDriverCurrent = mMap.addMarker(mDriverCurrentmarkerOptions);
+        }
+        mDriverCurrent.setPosition(latLng);
+    }
+
+
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.nav_help) {
+//            startActivity(new Intent(MapsActivity.this, HelpActivity.class));
+//            return true;
+//        } else if (id == R.id.nav_your_trips) {
+//
+//        } else if (id == R.id.nav_payment) {
+//
+//        } else if (id == R.id.nav_about) {
+//            startActivity(new Intent(MapsActivity.this, AboutActivity.class));
+//            return true;
+//        } else if (id == R.id.nav_settings) {
+//            startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
+//            return true;
+//        }
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
 
     public boolean drawRoute(ArrayList<LatLng> points, String mode, boolean withIndications, boolean optimize)
     {
