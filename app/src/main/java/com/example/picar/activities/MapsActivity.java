@@ -75,8 +75,10 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError
-        , User_http_request.UserHttpResponse {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError
+        , User_http_request.UserHttpResponse
+//        ,NavigationView.OnNavigationItemSelectedListener
+{
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
@@ -181,6 +183,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         setContentView(R.layout.activity_maps);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+        /**
+         * Start activity retrofit for test
+         */
+//        Intent i = new Intent(this,RetrofitActivity.class);
+//        startActivity(i);
+
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.addDrawerListener(toggle);
+//        toggle.syncState();
+//
+//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+//        navigationView.setNavigationItemSelectedListener(this);
 
 //        // Construct a GeoDataClient.
 //        mGeoDataClient = Places.getGeoDataClient(this);
@@ -887,4 +905,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
     }
+<<<<<<< HEAD
+
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.nav_help) {
+//            startActivity(new Intent(MapsActivity.this, HelpActivity.class));
+//            return true;
+//        } else if (id == R.id.nav_your_trips) {
+//
+//        } else if (id == R.id.nav_payment) {
+//
+//        } else if (id == R.id.nav_about) {
+//            startActivity(new Intent(MapsActivity.this, AboutActivity.class));
+//            return true;
+//        } else if (id == R.id.nav_settings) {
+//            startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
+//            return true;
+//        }
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
+
+=======
+>>>>>>> 20b8647568705b868e2127e8848f90ff0013e7e3
 }
