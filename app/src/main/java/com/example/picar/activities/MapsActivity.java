@@ -256,10 +256,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     mMap.animateCamera(zoom);
 
                 } else {
-
                     Intent i = new Intent(MapsActivity.this, CardViewActivity.class);
                     startActivity(i);
-                }
+//                }
 
             }
         });
