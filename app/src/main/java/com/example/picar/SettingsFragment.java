@@ -6,21 +6,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.widget.Toast;
 
 import com.example.picar.activities.MainActivity;
 import com.example.picar.activities.SettingsActivity;
+import com.example.picar.activities.UserInfoActivity;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
     SharedPreferences sharedPreferences;
-
+    String email;
+    SharedPreferences SP;
     @Override
     public void onCreatePreferences(Bundle bundle, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SP = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         SharedPreferences.Editor prefsEditor = SP.edit();
         prefsEditor.putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, Preferences.getInstance(getContext()).getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN));
@@ -61,6 +66,20 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         });
 
+        Preference user_info = findPreference("user_info");
+        user_info.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                SP = PreferenceManager.getDefaultSharedPreferences(getContext());
+                email = SP.getString("Email", "");
+
+                Intent i = new Intent(getContext(), UserInfoActivity.class);
+                i.putExtra("email", email);
+                startActivity(i);
+                return false;
+            }
+        });
     }
 
 

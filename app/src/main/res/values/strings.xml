@@ -33,6 +33,7 @@
     <string name="title_activity_settings">SettingsActivity</string>
 
     <string name="Name">Nom:    </string>
+    <string name="FirstName">First name:    </string>
     <string name="Phone">Phone: </string>
     <string name="Email">Email: </string>
     <string name="Password">Password:   </string>

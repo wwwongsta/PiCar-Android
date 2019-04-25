@@ -87,6 +87,9 @@
         <activity
             android:name=".activities.AboutActivity"
             android:exported="true"></activity>
+        <activity
+            android:name=".activities.UserInfoActivity"
+            android:exported="true"></activity>
     </application>
 
 </manifest>
