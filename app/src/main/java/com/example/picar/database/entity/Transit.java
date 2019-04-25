@@ -19,13 +19,13 @@ public class Transit {
 
 
     @ColumnInfo(name = "driverID")
-    private String driverId;
+    private String driverID;
 
     @ColumnInfo(name = "driver_current_positionID")
-    private String driver_current_position_id;
+    private String driver_current_positionID;
 
     @ColumnInfo(name = "driver_destination_positionID")
-    private String driver_destination_position_id;
+    private String driver_destination_positionID;
 
     @Ignore
     @ColumnInfo(name = "passager")
@@ -34,11 +34,11 @@ public class Transit {
     public Transit() {
     }
 
-    public Transit(@NonNull String id, String driverId, String driver_current_position_id, String driver_destination_position_id, List<Passager> passager) {
+    public Transit(@NonNull String id, String driverID, String driver_current_positionID, String driver_destination_positionID, List<Passager> passager) {
         this.id = id;
-        this.driverId = driverId;
-        this.driver_current_position_id = driver_current_position_id;
-        this.driver_destination_position_id = driver_destination_position_id;
+        this.driverID = driverID;
+        this.driver_current_positionID = driver_current_positionID;
+        this.driver_destination_positionID = driver_destination_positionID;
         this.passager = passager;
     }
 
@@ -51,28 +51,28 @@ public class Transit {
         this.id = id;
     }
 
-    public String getDriverId() {
-        return driverId;
+    public String getDriverID() {
+        return driverID;
     }
 
-    public void setDriverId(String driverId) {
-        this.driverId = driverId;
+    public void setDriverID(String driverID) {
+        this.driverID = driverID;
     }
 
-    public String getDriver_current_position_id() {
-        return driver_current_position_id;
+    public String getDriver_current_positionID() {
+        return driver_current_positionID;
     }
 
-    public void setDriver_current_position_id(String driver_current_position_id) {
-        this.driver_current_position_id = driver_current_position_id;
+    public void setDriver_current_positionID(String driver_current_positionID) {
+        this.driver_current_positionID = driver_current_positionID;
     }
 
-    public String getDriver_destination_position_id() {
-        return driver_destination_position_id;
+    public String getDriver_destination_positionID() {
+        return driver_destination_positionID;
     }
 
-    public void setDriver_destination_position_id(String driver_destination_position_id) {
-        this.driver_destination_position_id = driver_destination_position_id;
+    public void setDriver_destination_positionID(String driver_destination_positionID) {
+        this.driver_destination_positionID = driver_destination_positionID;
     }
 
     public List<Passager> getPassager() {

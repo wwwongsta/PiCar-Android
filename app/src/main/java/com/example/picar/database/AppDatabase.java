@@ -19,7 +19,7 @@ import com.example.picar.database.entity.UserCar;
 
 @Database(entities = {  User.class, UserCar.class,
                         Transaction.class, Transit.class, Position.class}
-                        ,version = 3, exportSchema = false)
+                        ,version = 4, exportSchema = false)
 @TypeConverters({DateTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
