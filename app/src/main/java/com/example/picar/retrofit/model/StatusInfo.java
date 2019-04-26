@@ -7,10 +7,15 @@ public class StatusInfo {
      */
     private String status;
     private String passagerId;
+    private String driverID;
 
-    public StatusInfo(String status, String passagerId) {
+    public StatusInfo(String status, String passagerId,String driverID) {
         this.status = status;
         this.passagerId = passagerId;
+        this.driverID = driverID;
+    }
+    public String getDriverID() {
+        return driverID;
     }
 
     public String getStatus() {
@@ -19,5 +24,9 @@ public class StatusInfo {
 
     public String getPassagerId() {
         return passagerId;
+    }
+
+    public String getDriverID() {
+        return driverID;
     }
 }

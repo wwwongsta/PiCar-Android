@@ -43,16 +43,6 @@ public class Transit {
         this.passager = passager;
     }
 
-
-
-    public String getDriverID() {
-        return driverID;
-    }
-
-    public void setDriverID(String driverID) {
-        this.driverID = driverID;
-    }
-
     @NonNull
     public String getId() {
         return id;

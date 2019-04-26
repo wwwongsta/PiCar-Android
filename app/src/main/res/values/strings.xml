@@ -29,7 +29,7 @@
     <string name="option_get_place">Get place</string>
     <string name="pick_place">Choose a place</string>
 
-    <string name="google_maps_key">AIzaSyAvQoPc9frRXZfH7huDMPYXSsYQLOfIG0A</string>
+    <string name="google_maps_key">AIzaSyDv6rxb3MgxJOWHIza7d1YQEkAnTMjpuh4</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <string name="Name">Nom:    </string>

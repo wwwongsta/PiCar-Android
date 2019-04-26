@@ -3,6 +3,7 @@ package com.example.picar.retrofit.http_request;
 import android.app.Activity;
 import android.util.Log;
 
+import com.example.picar.activities.SelectedDriver;
 import com.example.picar.database.entity.Position;
 import com.example.picar.database.entity.Transit;
 import com.example.picar.retrofit.PiCarApi;
@@ -38,6 +39,8 @@ public class User_http_request {
             Log.e(TAG," On attach class cast exception " + e.getMessage());
         }
     }
+
+
     public interface UserHttpError{
         default void errorMessage(Call<Message> call, Throwable t){
 
