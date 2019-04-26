@@ -79,65 +79,39 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
     String token = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJqZWN0IjoiNWNhYmE2YmUwOWJhYjkyN2QxMWIwMTRhIiwiaWF0IjoxNTU1MzM2MDkwfQ.Ivk36K7629DVF_oSCeDqNO_N_DhDS8n37_mN09qmHXE";
     String userId = "";
     public void isListUSerArroudEmpty(User user){
-            PositionDestination posDes = new PositionDestination(user.getCurrent_position_id(), user.getDestination_id());
-            Call<List<DriverId>> call = api.getNearByDriver(posDes);
-            call.enqueue(new Callback<List<DriverId>>() {
-                @Override
-                public void onResponse(Call<List<DriverId>> call, Response<List<DriverId>> response) {
-                    List<DriverId> list = response.body();
-                    if(response.body() != null){
-                        for (DriverId driver:list) {
-                            Call<UserInfo> call2 = api.getUserById(driver.getDriverId());
-                            call2.enqueue(new Callback<UserInfo>() {
-                                @Override
-                                public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
-                                    UserInfo aUser = response.body();
-                                    driverList.add(aUser);
-                                    adapteur.notifyDataSetChanged();
-                                }
-
-                                @Override
-                                public void onFailure(Call<UserInfo> call, Throwable t) {
-
-                                }
-                            });
-                        }
-                    }else{
-                        noUserArround();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<DriverId>> call, Throwable t) {
-
-                }
-            });
-    }
-    public void noUserArround(){
-        String id = "5cc0cba41b30070017e13fc2";
-        Call<Transit> callTest = api.getTransit(id);
-        callTest.enqueue(new Callback<Transit>() {
+        PositionDestination posDes = new PositionDestination(user.getCurrent_position_id(), user.getDestination_id());
+        Call<List<DriverId>> call = api.getNearByDriver(posDes);
+        call.enqueue(new Callback<List<DriverId>>() {
             @Override
-            public void onResponse(Call<Transit> call, Response<Transit> response) {
-                Transit aUser = response.body();
-                Call<UserInfo> call2 = api.getUserById(aUser.getDriverID());
-                call2.enqueue(new Callback<UserInfo>() {
-                    @Override
-                    public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
-                        UserInfo aUser = response.body();
-                        driverList.add(aUser);
-                        adapteur.notifyDataSetChanged();
+            public void onResponse(Call<List<DriverId>> call, Response<List<DriverId>> response) {
+                List<DriverId> list = response.body();
+                if(response.body() != null){
+                    for (DriverId driver:list) {
+                        Call<UserInfo> call2 = api.getUserById(driver.getDriverId());
+                        call2.enqueue(new Callback<UserInfo>() {
+                            @Override
+                            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+                                UserInfo aUser = response.body();
+                                driverList.add(aUser);
+                                adapteur.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onFailure(Call<UserInfo> call, Throwable t) {
+
+                            }
+                        });
                     }
-
-                    @Override
-                    public void onFailure(Call<UserInfo> call, Throwable t) {
-
-
-                @Override
-                public void onFailure(Call<List<DriverId>> call, Throwable t) {
-
+                }else{
+                    noUserArround();
                 }
-            });
+            }
+
+            @Override
+            public void onFailure(Call<List<DriverId>> call, Throwable t) {
+
+            }
+        });
     }
     public void noUserArround(){
         String id = "5cc0cba41b30070017e13fc2";
@@ -236,9 +210,6 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + getString(R.string.google_maps_key);
         return url;
 
-//        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//        recyclerView.setAdapter(new RecyclerViewAdapter(list));
     }
 
     private void setUpMarkers(MarkerOptions mCurrentMarkerOptions,MarkerOptions mDestinationMarkerOptions,
@@ -300,7 +271,7 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
 
             }
         });
-   }
+    }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.recycler_view_fragment, container, false);

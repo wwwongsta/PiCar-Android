@@ -1,6 +1,7 @@
 package com.example.picar.activities;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -30,8 +32,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.picar.JSONParser;
@@ -96,8 +100,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private CameraPosition mCameraPosition;
     private String token = "";
 
-    private PutPositionTask putPositionTask = null;
+
+    /*AsynTask*/
     private GetTransitWithDriveID getTransitWithDriveID = null;
+    private GetPositionCurrent_IDPosition getPositionCurrent_idPosition = null;
+
+
+    private PutPositionTask putPositionTask = null;
     private GetTransitByDriverIdTask getTransitByDriverIdTask = null;
     private UpdateStatusToValidatedTask updateStatusToValidatedTask = null;
     private UpdateStatusToRefusedTask updateStatusToRefusedTask = null;
@@ -130,18 +139,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Address mCurrentAddress;
     private Address mDestinationAddress;
 
+    LinearLayout mainLayout;
+
     private MarkerOptions mCurrentMarkerOptions;
     private MarkerOptions mDestinationMarkerOptions;
-    private MarkerOptions mDriverCurrentmarkerOptions = new MarkerOptions(); ;
+    private MarkerOptions mDriverCurrentmarkerOptions = new MarkerOptions();
     private Marker mDriverCurrent;
 
-    private MarkerOptions passagerTempMarkerOptions;
+
     private MarkerOptions passagerCurrentMarkerOptions;
     private MarkerOptions passagerDestinationMarkerOptions;
 
-    private MarkerOptions passagerTempMarkerOptions;
-    private MarkerOptions passagerCurrentMarkerOptions;
-    private MarkerOptions passagerDestinationMarkerOptions;
+
 
     private Polyline currentPolyline;
 
@@ -203,24 +212,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
         api = retrofit.create(PiCarApi.class);
 
-
         setContentView(R.layout.activity_maps);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-        /**
-         * Start activity retrofit for test
-         */
-//        Intent i = new Intent(this,RetrofitActivity.class);
-//        startActivity(i);
-
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.addDrawerListener(toggle);
-//        toggle.syncState();
-//
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -244,16 +236,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 setCurrentLocation(ed_location);
                 setDestinationLocation(ed_destination);
-                if (mCurrentAddress != null && mDestinationAddress != null) {
-                    if(mDestinationMarkerOptions != null){
-                        mMap.clear();
-                        setCurrentLocation(ed_location);
-                        setDestinationLocation(ed_destination);
-                        setUpMarkers(v);
-                    }else{
-                        setUpMarkers(v);
-                    }
+                ArrayList<MarkerOptions> markers = new ArrayList<>();
+
+                mCurrentMarkerOptions = new MarkerOptions().position(new LatLng(mCurrentAddress.getLatitude(), mCurrentAddress.getLongitude()));
+                mDestinationMarkerOptions = new MarkerOptions().position(new LatLng(mDestinationAddress.getLatitude(), mDestinationAddress.getLongitude()));
+                markers.add(mCurrentMarkerOptions);
+                markers.add(mDestinationMarkerOptions);
+                //new FetchUrl(MapsActivity.this).execute(getUrl(mCurrentMarkerOptions.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+
+                //show all marker on the map
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                for (MarkerOptions marker : markers) {
+                    builder.include(marker.getPosition());
                 }
+                LatLngBounds bounds = builder.build();
+
+                int padding = 100; // offset from edges of the map in pixels
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+                mMap.animateCamera(cu);
+
+                String currentLocationId = AppDatabase.getInstance(v.getContext()).userDao().getUserCurrentPositionId();
+                String destinationId = AppDatabase.getInstance(v.getContext()).userDao().getDestinationId();
+
+                putPositionTask = new PutPositionTask(currentLocationId, mCurrentMarkerOptions);
+                putPositionTask.execute((Void) null);
+                putPositionTask = new PutPositionTask(destinationId, mDestinationMarkerOptions);
+                putPositionTask.execute((Void) null);
+
+                // Then just use the following:
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
             }
         });
 
@@ -279,7 +292,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Handler handlerCheckPassager = new Handler();
 
                     int delayCheckPassager = 5000; //milliseconds
-
+                    waypoints = null;
                     handlerCheckPassager.postDelayed(new Runnable() {
                         public void run() {
                             getTransitByDriverIdTask = new GetTransitByDriverIdTask(user.get_id());
@@ -290,8 +303,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 for(Transit.Passager p : transit.getPassager()){
                                     if(p.getPassagerStatus().equalsIgnoreCase("waiting")){
                                         handlerCheckPassager.removeCallbacks(this);
-//                                        GetPassagerByIdTask getPassagerByIdTask = new GetPassagerByIdTask(p.getPassagerId());
-//                                        getPassagerByIdTask.execute((Void) null);
+                                        GetPassagerByIdTask getPassagerByIdTask = new GetPassagerByIdTask(p.getPassagerId());
+                                        getPassagerByIdTask.execute((Void) null);
 
                                         break;
                                     }
@@ -304,6 +317,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             }else{
                                 handlerCheckPassager.postDelayed(this, delayCheckPassager);
                             }
+
+
 
 
                         }
@@ -325,18 +340,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             handlerChangePosition.postDelayed(this, delay);
                         }
                     }, delay);
-
-                    CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-                    CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-                    mMap.moveCamera(center);
-                    mMap.animateCamera(zoom);
-
                 } else {
 
                     Intent i = new Intent(MapsActivity.this, CardViewActivity.class);
                     startActivity(i);
                 }
-
             }
         });
         if (!validated.equals("")) {
@@ -356,11 +364,71 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }, 0, 1000);
 
-
         }
         if (TYPE.equals("Driver")) {
             btn_rides.setText("Start ride");
         }
+    }
+    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
+        String idDriver;
+        GetTransitWithDriveID(String id) {
+            idDriver = id;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            request.getTransitforPosition(idDriver);
+            return true;
+        }
+    }
+
+    @Override
+    public void getTransitforPosition(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
+        DriverInfoForTransit mess = response.body();
+        getPositionCurrent_idPosition = new GetPositionCurrent_IDPosition(mess.getDriver_current_positionID());
+        getPositionCurrent_idPosition.execute();
+
+    }
+
+    public class GetPositionCurrent_IDPosition extends AsyncTask<Void, Void, Boolean> {
+        String iDPosition;
+
+        GetPositionCurrent_IDPosition(String idPositionDrive) {
+            iDPosition = idPositionDrive;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            User_http_request request = new User_http_request(MapsActivity.this);
+            request.getPosition(token, iDPosition);
+            //Log.e("DriverPosition","doInBackground to get GetPositionCurrent_IDPosition");
+            return true;
+        }
+    }
+
+    @Override
+    public void getPosition(Call<Position> call, Response<Position> response) {
+        Position mess = response.body();
+//        Log.e("DriverPosition", " getPosition(Call<Position> call, Response<Position> response) ");
+//        Log.e("DriverPosition", "Message : "+response.message() + "  Code : "+ response.code());
+        Log.e("DriverPosition", "Latitude: " + mess.getLat());
+        Log.e("DriverPosition", "Longitude : " + mess.getLng());
+        Log.e("DriverPosition----", mess.getUserId());
+
+
+        changeMarkerPosition(new LatLng(mess.getLat(), mess.getLng()));
+
+    }
+
+    public void changeMarkerPosition(LatLng latLng) {
+        mDriverCurrentmarkerOptions.position(latLng);
+        mDriverCurrentmarkerOptions.title("Current Driver Location Position");
+        mDriverCurrentmarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.fiat));
+        if (mDriverCurrent == null) {
+            mDriverCurrent = mMap.addMarker(mDriverCurrentmarkerOptions);
+        }
+        mDriverCurrent.setPosition(latLng);
     }
 
     private void setUpMarkers(View v) {
@@ -681,8 +749,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public class UpdateStatusToValidatedTask extends AsyncTask<Void, Void, Boolean> {
 
-
-
         private String passagerId;
         //        private final String mPosition;
         private String status;
@@ -690,13 +756,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         UpdateStatusToValidatedTask(String passagerId, String driverID) {
             this.passagerId = passagerId;
-            this.status = "Validated";
+            this.status = "validated";
             this.driverID = driverID;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            StatusInfo statusInfo = new StatusInfo(passagerId, status, driverID);
+            StatusInfo statusInfo = new StatusInfo(status, passagerId, driverID);
             Call<Transit> call = api.updateStatus(statusInfo);
             call.enqueue(new Callback<Transit>() {
                 @Override
@@ -728,7 +794,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             this.driverID = driverID;
         }
 
-
         @Override
         protected Boolean doInBackground(Void... params) {
             StatusInfo statusInfo = new StatusInfo(passagerId, status, driverID);
@@ -736,7 +801,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             call.enqueue(new Callback<Transit>() {
                 @Override
                 public void onResponse(Call<Transit> call, Response<Transit> response) {
-                    
+
                 }
                 @Override
                 public void onFailure(Call<Transit> call, Throwable t) {
@@ -762,14 +827,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         protected Boolean doInBackground(Void... params) {
             DriverInfoForTransit driverInfoForTransit = new DriverInfoForTransit(driverID, driver_current_positionID, driver_destination_positionID);
             Call<Transit> call = api.createTransit(driverInfoForTransit);
-//            call.enqueue(new Callback<Transit>() {
-//                @Override
-//                public void onResponse(Call<Transit> call, Response<Transit> response) {
-//                }
-//                @Override
-//                public void onFailure(Call<Transit> call, Throwable t) {
-//                }
-//            });
+            call.enqueue(new Callback<Transit>() {
+                @Override
+                public void onResponse(Call<Transit> call, Response<Transit> response) {
+                }
+                @Override
+                public void onFailure(Call<Transit> call, Throwable t) {
+                }
+            });
             return null;
 
         }
@@ -777,15 +842,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public class GetTransitByDriverIdTask extends AsyncTask<Void, Void, Boolean> {
 
-
         private String driverID;
-
-
         public GetTransitByDriverIdTask(String driverID) {
             this.driverID = driverID;
-
         }
-    }
+
 
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -806,7 +867,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public class GetPassagerCurrentPositionTask extends AsyncTask<Void, Void, Boolean> {
         private String positionId;
-
         public GetPassagerCurrentPositionTask(String positionId) {
             this.positionId = positionId;
         }
@@ -821,6 +881,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     passagerCurrentMarkerOptions = new MarkerOptions().position(new LatLng(position.getLat(), position.getLng())).icon(BitmapDescriptorFactory
                             .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
                     mMap.addMarker(passagerCurrentMarkerOptions);
+
                 }
 
                 @Override
@@ -829,7 +890,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             });
             return null;
         }
-
     }
 
     public class GetPassagerDestinationPositionTask extends AsyncTask<Void, Void, Boolean> {
@@ -855,6 +915,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     waypoints.add(new LatLng(passagerCurrentMarkerOptions.getPosition().latitude, passagerCurrentMarkerOptions.getPosition().longitude));
                     waypoints.add(new LatLng(passagerDestinationMarkerOptions.getPosition().latitude, passagerDestinationMarkerOptions.getPosition().longitude));
                     waypoints.add(new LatLng(mDestinationMarkerOptions.getPosition().latitude, mDestinationMarkerOptions.getPosition().longitude));
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    for (LatLng latLng : waypoints) {
+                        builder.include(latLng);
+                    }
+                    LatLngBounds bounds = builder.build();
+
+                    int padding = 100; // offset from edges of the map in pixels
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+                    mMap.animateCamera(cu);
 
                     drawRoute(waypoints,"driving", false, true);
                 }
@@ -910,110 +980,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
                     builder.setTitle("Confirm");
-//                    builder.setMessage("Accepter vous le passager : " );
-                                        builder.setMessage("Accepter vous le passager :" + passager.getUser_info().getName());
-                    builder.setPositiveButton("Yes", dialogClickListener);
-                    builder.setNegativeButton("No", dialogClickListener);
-                    builder.show();
-                }
 
-                @Override
-                public void onFailure(Call<UserInfo> call, Throwable t) {
-                }
-            });
-            return null;
-        }
-
-
-    public class GetPassagerPositionTask extends AsyncTask<Void, Void, Boolean> {
-        private String positionId;
-
-        public GetPassagerPositionTask(String positionId) {
-            this.positionId = positionId;
-        }
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            Call<Position> call = api.getPosition(token, positionId);
-            call.enqueue(new Callback<Position>() {
-                @Override
-                public void onResponse(Call<Position> call, Response<Position> response) {
-                    Position position = response.body();
-                    passagerTempMarkerOptions = new MarkerOptions().position(new LatLng(position.getLat(), position.getLng())).icon(BitmapDescriptorFactory
-                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                    mMap.addMarker(passagerTempMarkerOptions);
-                }
-
-                @Override
-                public void onFailure(Call<Position> call, Throwable t) {
-                }
-            });
-            return null;
-        }
-
-    }
-    public class UpdatePositionService extends Service {
-        Handler handler;
-        Runnable test;
-
-        public UpdatePositionService() {
-            handler = new Handler();
-            test = new Runnable() {
-                @Override
-                public void run() {
-                    String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
-                    MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
-                    putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
-                    //new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
-                    putPositionTask.execute((Void) null);
-                    handler.postDelayed(test, 4000);
-                }
-            };
-
-            handler.postDelayed(test, 0);
-        }
-    public class GetPassagerByIdTask extends AsyncTask<Void, Void, Boolean> {
-
-
-        private String passagerId;
-
-
-        public GetPassagerByIdTask(String passsagerId) {
-            this.passagerId = passsagerId;
-
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            Call<UserInfo> call = api.getUserById(passagerId);
-            call.enqueue(new Callback<UserInfo>() {
-                @Override
-                public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
-                    passager = response.body();
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    updateStatusToValidatedTask = new UpdateStatusToValidatedTask(passager.getUser_info().get_id());
-                                    updateStatusToValidatedTask.execute((Void) null);
-
-
-
-                                    passagerTrouver = true;
-                                    break;
-
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    updateStatusToRefusedTask = new UpdateStatusToRefusedTask(passager.getUser_info().get_id());
-                                    updateStatusToRefusedTask.execute((Void) null);
-                                    passagerTrouver = false;
-                                    break;
-                            }
-                        }
-                    };
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-                    builder.setTitle("Confirm");
-//                    builder.setMessage("Accepter vous le passager : " );
                     builder.setMessage("Accepter vous le passager :" + passager.getUser_info().getName());
                     builder.setPositiveButton("Yes", dialogClickListener);
                     builder.setNegativeButton("No", dialogClickListener);
@@ -1027,115 +994,53 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return null;
         }
 
-    }
+        public class UpdatePositionService extends Service {
+            Handler handler;
+            Runnable test;
 
-        @Override
-        public IBinder onBind(Intent intent) {
-            return null;
-        }
-    }
-    public class GetTransitWithDriveID extends AsyncTask<Void, Void, Boolean> {
-        String idDriver;
+            public UpdatePositionService() {
+                handler = new Handler();
+                test = new Runnable() {
+                    @Override
+                    public void run() {
+                        String currentLocationId = AppDatabase.getInstance(getApplicationContext()).userDao().getUserCurrentPositionId();
+                        MarkerOptions newCurrentPosition = new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()));
+                        putPositionTask = new PutPositionTask(currentLocationId, newCurrentPosition);
+                        //new FetchUrl(MapsActivity.this).execute(getUrl(newCurrentPosition.getPosition(), mDestinationMarkerOptions.getPosition(), "driving"), "driving");
+                        putPositionTask.execute((Void) null);
+                        handler.postDelayed(test, 4000);
+                    }
+                };
 
-        GetTransitWithDriveID(String id) {
-            idDriver = id;
-        }
+                handler.postDelayed(test, 0);
+            }
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            User_http_request request = new User_http_request(MapsActivity.this);
-            request.getTransitforPosition(idDriver);
-         //   Log.e("DriverPosition","doInBackground to get driver current position id");
+            @Nullable
+            @Override
+            public IBinder onBind(Intent intent) {
+                return null;
+            }
 
-
-            return true;
-        }
-    }
-    @Override
-    public void getTransitforPosition(Call<DriverInfoForTransit> call, Response<DriverInfoForTransit> response) {
-        DriverInfoForTransit mess = response.body();
-//        Log.e("DriverPosition", " Response<DriverInfoForTransit> response ");
-//        Log.e("DriverPosition", response.message());
-//        Log.e("DriverPosition - current id", mess.getDriver_current_positionID());
-//        Log.e("DriverPosition - current destiation", mess.getDriver_destination_positionID());
-//        Log.e("DriverPosition- current driver id", mess.getDriverID());
-
-        getPositionCurrent_idPosition = new GetPositionCurrent_IDPosition( mess.getDriver_current_positionID());
-        getPositionCurrent_idPosition.execute();
-
-
-    }
-    public class GetPositionCurrent_IDPosition extends AsyncTask<Void, Void, Boolean> {
-        String iDPosition;
-
-        GetPositionCurrent_IDPosition(String idPositionDrive) {
-            iDPosition = idPositionDrive;
         }
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            User_http_request request = new User_http_request(MapsActivity.this);
-            request.getPosition(token,iDPosition);
-            //Log.e("DriverPosition","doInBackground to get GetPositionCurrent_IDPosition");
-            return true;
+        public class GetPositionCurrent_IDPosition extends AsyncTask<Void, Void, Boolean> {
+            String iDPosition;
+
+            GetPositionCurrent_IDPosition(String idPositionDrive) {
+                iDPosition = idPositionDrive;
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                User_http_request request = new User_http_request(MapsActivity.this);
+                request.getPosition(token,iDPosition);
+                //Log.e("DriverPosition","doInBackground to get GetPositionCurrent_IDPosition");
+                return true;
+            }
         }
     }
-
-    @Override
-    public void getPosition(Call<Position> call, Response<Position> response) {
-        Position mess = response.body();
-//        Log.e("DriverPosition", " getPosition(Call<Position> call, Response<Position> response) ");
-//        Log.e("DriverPosition", "Message : "+response.message() + "  Code : "+ response.code());
-        Log.e("DriverPosition", "Latitude: "+mess.getLat());
-        Log.e("DriverPosition", "Longitude : "+mess.getLng());
-        Log.e("DriverPosition----", mess.getUserId());
-
-
-        changeMarkerPosition( new LatLng(mess.getLat(), mess.getLng()));
-
-    }
-    public void changeMarkerPosition(LatLng latLng) {
-        mDriverCurrentmarkerOptions.position(latLng);
-        mDriverCurrentmarkerOptions.title("Current Driver Location Position");
-        mDriverCurrentmarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.fiat));
-        if(mDriverCurrent == null) {
-            mDriverCurrent = mMap.addMarker(mDriverCurrentmarkerOptions);
-        }
-        mDriverCurrent.setPosition(latLng);
-    }
-
-
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_help) {
-//            startActivity(new Intent(MapsActivity.this, HelpActivity.class));
-//            return true;
-//        } else if (id == R.id.nav_your_trips) {
-//
-//        } else if (id == R.id.nav_payment) {
-//
-//        } else if (id == R.id.nav_about) {
-//            startActivity(new Intent(MapsActivity.this, AboutActivity.class));
-//            return true;
-//        } else if (id == R.id.nav_settings) {
-//            startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
-//            return true;
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
-
     public boolean drawRoute(ArrayList<LatLng> points, String mode, boolean withIndications, boolean optimize)
     {
-//        mMap = map;
-//        context = c;
-//        lang = language;
 
         String url = makeURL(points,mode,optimize);
         new connectAsyncTask(url,withIndications).execute();
@@ -1334,6 +1239,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
 
 }

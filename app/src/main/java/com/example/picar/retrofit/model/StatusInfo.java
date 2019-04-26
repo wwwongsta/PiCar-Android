@@ -26,7 +26,5 @@ public class StatusInfo {
         return passagerId;
     }
 
-    public String getDriverID() {
-        return driverID;
-    }
+
 }

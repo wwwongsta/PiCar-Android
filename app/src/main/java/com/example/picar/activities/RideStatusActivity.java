@@ -3,7 +3,6 @@ package com.example.picar.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -49,21 +48,6 @@ public class RideStatusActivity extends AppCompatActivity {
         my_timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-
-        if(!STATUS.equals("validated") || !STATUS.equals("refused")){
-            //waiting response
-            rideStatus.setText("Waiting...");
-        }
-        if(STATUS.equals("validated")){
-            rideStatus.setText("Retreiving Driver Info");
-            Intent passager = new Intent(RideStatusActivity.this, MapsActivity.class);
-            passager.putExtra("type", "Passager");
-            passager.putExtra("status", "validated");
-            passager.putExtra("driver_id", driver_id);
-            Log.e("DriverID","SEND TO MAPS ACTIVITY "+driver_id);
-            passager.putExtra("driver_current_location_id", driver_location_id);
-            passager.putExtra("driver_destination_id", driver_destination_id);
-
                 Call<Transit> call = api.getTransit(driver_id);
                 call.enqueue(new Callback<Transit>() {
                     @Override
@@ -82,22 +66,12 @@ public class RideStatusActivity extends AppCompatActivity {
                         }
                     }
 
-
                     @Override
                     public void onFailure(Call<Transit> call, Throwable t) {
                         rideStatus.setText(t.getMessage());
                         return;
                     }
                 });
-
-
-                    @Override
-                    public void onFailure(Call<Transit> call, Throwable t) {
-                        rideStatus.setText(t.getMessage());
-                        return;
-                    }
-                });
-
 
                 if (!STATUS.equals("validated") || !STATUS.equals("refused")) {
                     //waiting response
