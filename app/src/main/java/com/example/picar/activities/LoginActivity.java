@@ -5,6 +5,7 @@ package com.example.picar.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -17,17 +18,18 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
+import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -35,10 +37,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.example.picar.Preferences;
 import com.example.picar.R;
 import com.example.picar.database.AppDatabase;
-import com.example.picar.database.entity.User;
-import com.example.picar.retrofit.PiCarApi;
 import com.example.picar.retrofit.http_request.User_http_request;
 import com.example.picar.retrofit.model.user_type.UserInfo;
 import com.example.picar.retrofit.model.user_type.UserLogin;
@@ -46,10 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -128,23 +127,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
 
+
         mLoggedInCheckbox = (CheckBox) findViewById(R.id.checkBox_stay_logged_in);
+        mLoggedInCheckbox.setChecked(Preferences.getInstance(getBaseContext()).getBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN));
         mLoggedInCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPreferences prefs = getSharedPreferences(getApplicationContext().getPackageName(), Context.MODE_PRIVATE);
-
                 if (mLoggedInCheckbox.isChecked()) {
-                    prefs.edit().putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, true).commit();
+                    Preferences.getInstance(getBaseContext()).putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, true);
                 } else {
-                    prefs.edit().putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false).commit();
+                    Preferences.getInstance(getBaseContext()).putBoolean(SettingsActivity.KEY_PREF_STAY_LOGGED_IN, false);
                 }
             }
         });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
     }
+
+
     public void startRegisterActivite(View view) {
         startActivity(new Intent(this,RegisterActivity.class));
     }
@@ -209,6 +211,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("Email", email);
+        editor.commit();
 
         boolean cancel = false;
         View focusView = null;
@@ -383,12 +390,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public void login(Call<UserInfo> call, Response<UserInfo> response){
         UserInfo userInfo = response.body();
-        //userInfo.getAuthorization()
-        //preferences
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("Authorization",userInfo.getAuthorization());
-        editor.apply();
+
+        Preferences.getInstance(getBaseContext()).putString("Authorization",userInfo.getAuthorization());
 
         AddUserInfoToDatabase addUser = new AddUserInfoToDatabase(userInfo, this);
         addUser.execute((Void) null);
@@ -425,7 +428,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
 
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
         private final String mEmail;
         private final String mPassword;
 

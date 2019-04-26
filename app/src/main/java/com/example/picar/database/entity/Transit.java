@@ -31,6 +31,7 @@ public class Transit {
     @ColumnInfo(name = "passager")
     private List<Passager> passager;
 
+
     public Transit() {
     }
 

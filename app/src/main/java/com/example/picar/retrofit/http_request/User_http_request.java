@@ -3,6 +3,7 @@ package com.example.picar.retrofit.http_request;
 import android.app.Activity;
 import android.util.Log;
 
+import com.example.picar.activities.SelectedDriver;
 import com.example.picar.database.entity.Position;
 import com.example.picar.database.entity.Transit;
 import com.example.picar.retrofit.PiCarApi;
@@ -22,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class User_http_request {
     public static String TAG = "User_http_request";
-    private PiCarApi api;
+    public PiCarApi api;
     private UserHttpError errorHandler;
     private UserHttpResponse responseHandler;
     public User_http_request(Activity activity) {
@@ -38,6 +39,8 @@ public class User_http_request {
             Log.e(TAG," On attach class cast exception " + e.getMessage());
         }
     }
+
+
     public interface UserHttpError{
         default void errorMessage(Call<Message> call, Throwable t){
 
@@ -58,7 +61,7 @@ public class User_http_request {
         default void errorGetPosition(Call<Position> call, Throwable t){
 
         }
-        default void getTransitforPosition(Call<DriverInfoForTransit> call, Throwable t){
+        default void errorGetTransitforPosition(Call<DriverInfoForTransit> call, Throwable t){
 
         }
 
@@ -87,6 +90,22 @@ public class User_http_request {
 
         }
     }
+    public void getPosition(String token, String idPosition){
+
+        Call<Position> call = api.getPosition(token,idPosition);
+        call.enqueue(new Callback<Position>() {
+            @Override
+            public void onResponse(Call<Position> call, Response<Position> response) {
+                responseHandler.getPosition(call,response);
+
+            }
+            @Override
+            public void onFailure(Call<Position> call, Throwable t) {
+                errorHandler.errorGetPosition(call,t);
+            }
+        });
+
+    }
 
     public void getTransitforPosition(String idDriver){
 
@@ -99,7 +118,7 @@ public class User_http_request {
             }
             @Override
             public void onFailure(Call<DriverInfoForTransit> call, Throwable t) {
-                errorHandler.getTransitforPosition(call,t);
+                errorHandler.errorGetTransitforPosition(call,t);
             }
         });
 

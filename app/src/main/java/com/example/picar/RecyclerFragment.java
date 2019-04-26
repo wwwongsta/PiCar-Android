@@ -132,6 +132,32 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onFailure(Call<UserInfo> call, Throwable t) {
 
+
+                @Override
+                public void onFailure(Call<List<DriverId>> call, Throwable t) {
+
+                }
+            });
+    }
+    public void noUserArround(){
+        String id = "5cc0cba41b30070017e13fc2";
+        Call<Transit> callTest = api.getTransit(id);
+        callTest.enqueue(new Callback<Transit>() {
+            @Override
+            public void onResponse(Call<Transit> call, Response<Transit> response) {
+                Transit aUser = response.body();
+                Call<UserInfo> call2 = api.getUserById(aUser.getDriverID());
+                call2.enqueue(new Callback<UserInfo>() {
+                    @Override
+                    public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+                        UserInfo aUser = response.body();
+                        driverList.add(aUser);
+                        adapteur.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onFailure(Call<UserInfo> call, Throwable t) {
+
                     }
                 });
             }
@@ -210,6 +236,9 @@ public class RecyclerFragment extends Fragment implements OnMapReadyCallback {
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + getString(R.string.google_maps_key);
         return url;
 
+//        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+//        recyclerView.setAdapter(new RecyclerViewAdapter(list));
     }
 
     private void setUpMarkers(MarkerOptions mCurrentMarkerOptions,MarkerOptions mDestinationMarkerOptions,
