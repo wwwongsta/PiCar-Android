@@ -49,7 +49,7 @@ public class RideStatusActivity extends AppCompatActivity {
         my_timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-<<<<<<< HEAD
+
         if(!STATUS.equals("validated") || !STATUS.equals("refused")){
             //waiting response
             rideStatus.setText("Waiting...");
@@ -63,7 +63,7 @@ public class RideStatusActivity extends AppCompatActivity {
             Log.e("DriverID","SEND TO MAPS ACTIVITY "+driver_id);
             passager.putExtra("driver_current_location_id", driver_location_id);
             passager.putExtra("driver_destination_id", driver_destination_id);
-=======
+
                 Call<Transit> call = api.getTransit(driver_id);
                 call.enqueue(new Callback<Transit>() {
                     @Override
@@ -82,13 +82,22 @@ public class RideStatusActivity extends AppCompatActivity {
                         }
                     }
 
+
                     @Override
                     public void onFailure(Call<Transit> call, Throwable t) {
                         rideStatus.setText(t.getMessage());
                         return;
                     }
                 });
->>>>>>> 865319b697234d635a92b27a6e8162cb715297a8
+
+
+                    @Override
+                    public void onFailure(Call<Transit> call, Throwable t) {
+                        rideStatus.setText(t.getMessage());
+                        return;
+                    }
+                });
+
 
                 if (!STATUS.equals("validated") || !STATUS.equals("refused")) {
                     //waiting response
