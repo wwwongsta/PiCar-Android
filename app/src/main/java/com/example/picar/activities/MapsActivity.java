@@ -91,9 +91,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError
-        , User_http_request.UserHttpResponse
-//        ,NavigationView.OnNavigationItemSelectedListener
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, TaskLoadedCallback, User_http_request.UserHttpError, User_http_request.UserHttpResponse
 {
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
@@ -104,23 +102,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /*AsynTask*/
     private GetTransitWithDriveID getTransitWithDriveID = null;
     private GetPositionCurrent_IDPosition getPositionCurrent_idPosition = null;
-
-
     private PutPositionTask putPositionTask = null;
     private GetTransitByDriverIdTask getTransitByDriverIdTask = null;
     private UpdateStatusToValidatedTask updateStatusToValidatedTask = null;
     private UpdateStatusToRefusedTask updateStatusToRefusedTask = null;
-
     private GetPassagerCurrentPositionTask getPassagerCurrentPositionTask = null;
     private GetPassagerDestinationPositionTask getPassagerDestinationPositionTask = null;
-
-//
-    // private GetTransitTask getTransitTask = null
-//private String GEOFENCE_REQ_ID = "myGeofence";
-//    private PendingIntent geofencePendingI;
-    // The entry points to the Places API.
-    //private GeoDataClient mGeoDataClient;
-    //private PlaceDetectionClient mPlaceDetectionClient;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -141,12 +128,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     LinearLayout mainLayout;
 
+
+
     private MarkerOptions mCurrentMarkerOptions;
     private MarkerOptions mDestinationMarkerOptions;
     private MarkerOptions mDriverCurrentmarkerOptions = new MarkerOptions();
     private Marker mDriverCurrent;
-
-
     private MarkerOptions passagerCurrentMarkerOptions;
     private MarkerOptions passagerDestinationMarkerOptions;
 
@@ -165,8 +152,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String TYPE;
     private String validated = "";
     private String driver_id;
-    private String driver_destination;
-    private String driver_currentPosition;
 
     Button btn_rides;
     Button btn_location;
@@ -196,6 +181,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             validated = intent.getStringExtra("status");
             driver_id = intent.getStringExtra("driver_id");
             Log.e("DriverID","getStringExtra " + driver_id);
+
+        }
+
+        if(validated == "validated"){
+
+            Log.e("DriverPosition","SetVissibility Gone");
+
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    getTransitWithDriveID = new GetTransitWithDriveID("5cc0cba41b30070017e13fc2");
+                    getTransitWithDriveID.execute();
+                }
+            }, 0, 1000);
 
         }
 
@@ -353,16 +352,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             btn_destination.setVisibility(View.GONE);
             ed_destination.setVisibility(View.GONE);
             ed_location.setVisibility(View.GONE);
-
-            Log.e("DriverPosition","SetVissibility Gone");
-
-            new Timer().scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    getTransitWithDriveID = new GetTransitWithDriveID("5cc0cba41b30070017e13fc2");
-                    getTransitWithDriveID.execute();
-                }
-            }, 0, 1000);
 
         }
         if (TYPE.equals("Driver")) {
@@ -585,12 +574,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                MarkerOptions markerOptions = new MarkerOptions()
-                        .position(new LatLng(lat, lon))
-                        .title("Driver :")
-                        .snippet("Estimated arrival time")
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.voiture_icon))
-                        .infoWindowAnchor(0.5f, 0.5f);
+                if (validated == "validated"){
+                    MarkerOptions markerOptions = new MarkerOptions()
+                            .position(new LatLng(lat, lon))
+                            .title("Driver :")
+                            .snippet("Estimated arrival time")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.voiture_icon))
+                            .infoWindowAnchor(0.5f, 0.5f);
+            }
                 // Marker m = mMap.addMarker(markerOptions);
             }
         }, 0, 1000);

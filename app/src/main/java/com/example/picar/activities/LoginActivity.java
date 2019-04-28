@@ -37,6 +37,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.picar.Preferences;
 import com.example.picar.R;
@@ -390,9 +391,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public void login(Call<UserInfo> call, Response<UserInfo> response){
         UserInfo userInfo = response.body();
+try {
+    Preferences.getInstance(getBaseContext()).putString("Authorization",userInfo.getAuthorization());
+}catch (Exception e ){
+    Toast.makeText(this, "L'addresse email ou le mot de passe n'est pas bon",Toast.LENGTH_LONG).show();
 
-        Preferences.getInstance(getBaseContext()).putString("Authorization",userInfo.getAuthorization());
-
+}
         AddUserInfoToDatabase addUser = new AddUserInfoToDatabase(userInfo, this);
         addUser.execute((Void) null);
         mAuthTask = null;
@@ -415,8 +419,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            db.userDao().alldelete();
-            db.userDao().insert(userInfo.getUser_info());
+                db.userDao().alldelete();
+                db.userDao().insert(userInfo.getUser_info());
             showProgress(false);
 
             return null;
